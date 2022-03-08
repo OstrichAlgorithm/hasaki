@@ -47,15 +47,38 @@
       </el-form-item>
       
     </el-form>
+
+    <el-dialog
+      title="进度"
+      :visible.sync="dialogVisible"
+      :before-close="handleClose"
+      center
+      width="30%"
+      top="45vh"
+    >
+      <div style="text-align: center;">
+        <el-progress
+          type="dashboard"
+          :percentage="percentage"
+          :color="colors"
+          :status="progressStaus"
+        ></el-progress>
+      </div>
+    </el-dialog>
   </div>
+
+
 </template>
 
 <script>
 // import Tinymce from "@/components/Tinymce";
-import { ipcRenderer } from "electron";
+import { ipcRenderer , shell } from "electron";
 import { Lcu } from "@/api/lcu"
 export default {
   mounted() {
+
+
+    this.CheckUpdate('one')
 
     var that =this;
     that.getAuth()
@@ -63,10 +86,105 @@ export default {
       return  that.getAuth()
     },10000)
   },
+  created() {
+    console.log("环境打印示例");
+    console.log(__lib);
+    console.log(process.env.TERGET_ENV);
+    console.log(process.env);
+    ipcRenderer.on("download-progress", (event, arg) => {
+      this.percentage = Number(arg);
+    });
+    ipcRenderer.on("download-error", (event, arg) => {
+      if (arg) {
+        this.progressStaus = "exception";
+        this.percentage = 40;
+        this.colors = "#d81e06";
+      }
+    });
+    ipcRenderer.on("download-paused", (event, arg) => {
+      if (arg) {
+        this.progressStaus = "warning";
+        this.$alert("下载由于未知原因被中断！", "提示", {
+          confirmButtonText: "重试",
+          callback: (action) => {
+            ipcRenderer.invoke("satrt-download");
+          },
+        });
+      }
+    });
+    ipcRenderer.on("download-done", (event, age) => {
+      this.filePath = age.filePath;
+      this.progressStaus = "success";
+      console.log("下载完成啦");
+      this.$alert("更新下载完成！", "提示", {
+        confirmButtonText: "确定",
+        callback: (action) => {
+          console.log(action)
+          // console.log(this.filePath)
+          // console.log(shell.openPath(this.filePath))
+          shell.openPath(this.filePath);
+        },
+      });
+    });
+    ipcRenderer.on("update-msg", (event, age) => {
+      console.log("update-msg", age);
+      switch (age.state) {
+        case -1:
+          const msgdata = {
+            title: "发生错误",
+            message: age.msg,
+          };
+          this.dialogVisible = false;
+          ipcRenderer.invoke("open-errorbox", msgdata);
+          break;
+        case 0:
+          this.$message("正在检查更新");
+          break;
+        case 1:
+          this.$message({
+            type: "success",
+            message: "已检查到新版本，开始下载",
+          });
+          // this.dialogVisible = true;
+          this.CheckUpdate('two')
+          break;
+        case 2:
+          this.$message({ type: "success", message: "无新版本" });
+          break;
+        case 3:
+          this.percentage = age.msg.percent.toFixed(1);
+          break;
+        case 4:
+          this.progressStaus = "success";
+          this.$alert("更新下载完成！", "提示", {
+            confirmButtonText: "确定",
+            callback: (action) => {
+              ipcRenderer.invoke("confirm-update");
+            },
+          });
+          break;
+
+        default:
+          break;
+      }
+    });
+  },
   // components: { Tinymce },
   data() {
     return {
       // lcu：'',
+      dialogVisible: false,
+      progressStaus: null,
+      filePath: "",
+      colors: [
+        { color: "#f56c6c", percentage: 20 },
+        { color: "#e6a23c", percentage: 40 },
+        { color: "#6f7ad3", percentage: 60 },
+        { color: "#1989fa", percentage: 80 },
+        { color: "#5cb87a", percentage: 100 },
+      ],
+      percentage:0,
+
       auth:{
         token:'',
         port:'',
@@ -108,6 +226,31 @@ export default {
       //  ipcRenderer.invoke("lcu-pick-task",this.form.champion_id).then((res) => {
       //     that.auth = res
       //   });
+    },
+
+
+    CheckUpdate(data) {
+      switch (data) {
+        case "one":
+          ipcRenderer.invoke("check-update").then((res) => {
+            console.log("启动检查");
+          });
+
+          break;
+        case "two":
+          ipcRenderer.invoke("start-download").then(() => {
+            this.dialogVisible = true;
+          });
+
+          break;
+
+        default:
+          break;
+      }
+    },
+
+     handleClose() {
+      this.dialogVisible = false;
     },
 
    

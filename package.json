@@ -1,6 +1,6 @@
 {
   "name": "hasaki",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "KFLee <https://github.com/OstrichAlgorithm>",
   "description": "hasaki-lol秒选助手",
   "license": "MIT",
@@ -26,7 +26,7 @@
         "url": "http://127.0.0.1"
       }
     ],
-    "productName": "hasaki-lol助手",
+    "productName": "hasaki",
     "appId": "org.ostrichalgorithm.hasaki",
     "directories": {
       "output": "build"

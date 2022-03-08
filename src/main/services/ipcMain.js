@@ -26,7 +26,8 @@ export default {
       BrowserWindow.fromWebContents(event.sender)?.close()
     })
     ipcMain.handle('start-download', (event, msg) => {
-      downloadFile.download(BrowserWindow.fromWebContents(event.sender), msg.downloadUrL)
+      // downloadFile.download(BrowserWindow.fromWebContents(event.sender), msg.downloadUrL)
+      downloadFile.download(BrowserWindow.fromWebContents(event.sender),'')
     })
     ipcMain.handle('check-update', (event, args) => {
       updater.checkUpdate(BrowserWindow.fromWebContents(event.sender))
