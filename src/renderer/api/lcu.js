@@ -10,7 +10,7 @@ export class Lcu {
   game_flow = '';
   last_game_flow = '';
   champion_id = 0;
-  job = '';
+  job = 0;
   ext_accept= false;
   constructor(token,port) {
     this.token = token;
@@ -55,7 +55,7 @@ export class Lcu {
   // //拥有英雄列表
   async ownedChampions() {
     var res =  await this.request('/lol-champions/v1/owned-champions-minimal', 'get')
-     console.log(res)
+    //  console.log(res)
     //整理数据
     var data = [];
     for (var a of res) {
@@ -72,7 +72,7 @@ export class Lcu {
       });
     }
 
-    console.log(data)
+    // console.log(data)
     return data;
   }
 
@@ -100,7 +100,7 @@ export class Lcu {
 
   // //接受对局
   async accept() {
-    console.log('accept')
+    // console.log('accept')
     await this.request('/lol-matchmaking/v1/ready-check/accept', 'post');
     // console.log(res)
 
@@ -109,9 +109,9 @@ export class Lcu {
   // 得到位置id 
   async getActionId() {
     var  res=  await this.request('/lol-champ-select/v1/session');
-    console.log('session',res )
+    // console.log('session',res )
     const localPlayerCellId = res.localPlayerCellId
-     console.log('getActionId',localPlayerCellId )
+    //  console.log('getActionId',localPlayerCellId )
     return localPlayerCellId >= 5 ? (localPlayerCellId - 5) : localPlayerCellId
   }
 
@@ -120,7 +120,7 @@ export class Lcu {
     var id = this.getActionId();
     if (id > -1) {
       res = await league.select_champion(champion_id, id)
-      console.log(res)
+      // console.log(res)
     }
   }
 
@@ -134,8 +134,7 @@ export class Lcu {
     // console.log(ext) 
     this.ext_accept = ext.indexOf('accept') >-1?true:false;
     // console.log(ext.indexOf('accept') >-1?true:false) 
-    
-    if (!this.job) {
+    if (this.job==0) {
 
       this.job = setInterval(async function (that) {
         that.game_flow = await that.gameFlow()
@@ -153,9 +152,12 @@ export class Lcu {
         }
         that.last_game_flow = that.game_flow
       }, 1000, that);
+    console.log(this.job)
+
+      
     } else {
       clearInterval(this.job);
-      this.job = '';
+      this.job = 0;
     }
 
   }

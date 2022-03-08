@@ -22,7 +22,7 @@ function createMainWindow() {
     width: 600,
     minWidth: 400,
     show: false,
-    resizable: false,
+    // resizable: false,
     frame: config.IsUseSysTitle,
     titleBarStyle: platform().includes('win32') ? 'default' : 'hidden',
     webPreferences: {

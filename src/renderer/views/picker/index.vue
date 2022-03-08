@@ -118,7 +118,7 @@ export default {
           that.auth = res
           that.lcu = new Lcu(that.auth.token,that.auth.port)
           that.lcu.ownedChampions().then((res)=>{
-            console.log(res)
+            // console.log(res)
             that.options =  res
           })
         });
