@@ -1,8 +1,8 @@
 {
-  "name": "electron-vue-admin",
+  "name": "hasaki",
   "version": "0.0.1",
-  "author": "sky <https://github.com/umbrella22>",
-  "description": "An electron-vue project",
+  "author": "KFLee <https://github.com/OstrichAlgorithm>",
+  "description": "hasaki-lol秒选助手",
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -26,8 +26,8 @@
         "url": "http://127.0.0.1"
       }
     ],
-    "productName": "electron-vue-admin",
-    "appId": "org.Sky.electron-vue",
+    "productName": "hasaki-lol助手",
+    "appId": "org.ostrichalgorithm.hasaki",
     "directories": {
       "output": "build"
     },
