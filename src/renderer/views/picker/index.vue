@@ -76,21 +76,10 @@ import { ipcRenderer , shell } from "electron";
 import { Lcu } from "@/api/lcu"
 export default {
   mounted() {
-
-
-    this.CheckUpdate('one')
-
-    var that =this;
-    that.getAuth()
-    setInterval(function(){
-      return  that.getAuth()
-    },10000)
+    this.init()
   },
   created() {
-    console.log("环境打印示例");
-    console.log(__lib);
-    console.log(process.env.TERGET_ENV);
-    console.log(process.env);
+ 
     ipcRenderer.on("download-progress", (event, arg) => {
       this.percentage = Number(arg);
     });
@@ -252,22 +241,46 @@ export default {
      handleClose() {
       this.dialogVisible = false;
     },
+     
 
-   
+
+    init(){
+      var that =this;
+      that.getAuth()
+      that.CheckUpdate('one')
+      setInterval(function(){
+        return  that.updateAuth()
+      },10000)
+    },
    
       getAuth(){
         var  that  =  this; 
        ipcRenderer.invoke("lcu-auth").then((res) => {
           that.auth = res
           that.lcu = new Lcu(that.auth.token,that.auth.port)
-          that.lcu.ownedChampions().then((res)=>{
-            // console.log(res)
-            that.options =  res
-          })
+          that.lcu.url_with_auth = res.url_with_auth;
+            that.lcu.ownedChampions().then((res)=>{
+              that.options =  res
+            })
+          //  that.options = that.lcu.ownedChampions()
         });
       },
-      
-     
+
+       updateAuth(){
+        var  that  =  this; 
+       ipcRenderer.invoke("lcu-auth").then((res) => {
+            that.auth = res
+            that.lcu.token = res.token;
+            that.lcu.port  = res.port;
+            that.lcu.url_with_auth = res.url_with_auth;
+            that.lcu.ownedChampions().then((res)=>{
+              that.options =  res
+            })
+          //  that.options = that.lcu.ownedChampions()
+
+        });
+      },
+
 
    
   }
