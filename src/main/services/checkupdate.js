@@ -74,9 +74,9 @@ class Update {
       // console.log('没有更新')
       // console.log('没有更新', event, arg)
       // console.log(event.version)
+      const version = require('../../../package.json').version
 
-
-      if(compareVersion(event.version, '0.0.2') > 0){
+      if(compareVersion(event.version, version) > 0){
         this.Message(this.mainWindow, 1)
       }else{
       this.Message(this.mainWindow, 2)
