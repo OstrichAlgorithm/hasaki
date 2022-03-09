@@ -1,8 +1,8 @@
-version: 0.0.2
+version: 0.0.3
 files:
-  - url: hasaki Setup 0.0.2.exe
-    sha512: VyR4Uet8ciTeT4RcG3qYdWXpFKoZl43/P9DWKUy/dilylcn3v8jFIduFukbQ3dN5QiqnYLWZYzO7SsHTTxLTmQ==
-    size: 58499869
-path: hasaki Setup 0.0.2.exe
-sha512: VyR4Uet8ciTeT4RcG3qYdWXpFKoZl43/P9DWKUy/dilylcn3v8jFIduFukbQ3dN5QiqnYLWZYzO7SsHTTxLTmQ==
-releaseDate: '2022-03-08T11:50:08.886Z'
+  - url: hasaki Setup 0.0.3.exe
+    sha512: iqQjISD5dDh3m7xK/hI9DPeDphmbooyct9FtChnvAoZCZfLpFtXyAxTWX1tIqR31c5yFD+O4S8K2L2YXINYhcA==
+    size: 61616301
+path: hasaki Setup 0.0.3.exe
+sha512: iqQjISD5dDh3m7xK/hI9DPeDphmbooyct9FtChnvAoZCZfLpFtXyAxTWX1tIqR31c5yFD+O4S8K2L2YXINYhcA==
+releaseDate: '2022-03-09T07:54:00.167Z'
