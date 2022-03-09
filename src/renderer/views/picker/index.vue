@@ -116,7 +116,8 @@ export default {
       });
     });
     ipcRenderer.on("update-msg", (event, age) => {
-      console.log("update-msg", age);
+      console.log("update-msg", event,age);
+
       switch (age.state) {
         case -1:
           const msgdata = {
@@ -135,7 +136,7 @@ export default {
             message: "已检查到新版本，开始下载",
           });
           // this.dialogVisible = true;
-          this.CheckUpdate('two')
+          this.CheckUpdate('two',age.msg)
           break;
         case 2:
           this.$message({ type: "success", message: "无新版本" });
@@ -218,7 +219,7 @@ export default {
     },
 
 
-    CheckUpdate(data) {
+    CheckUpdate(data,url='') {
       switch (data) {
         case "one":
           ipcRenderer.invoke("check-update").then((res) => {
@@ -227,7 +228,8 @@ export default {
 
           break;
         case "two":
-          ipcRenderer.invoke("start-download").then(() => {
+        // console.log(url)
+          ipcRenderer.invoke("start-download",url).then(() => {
             this.dialogVisible = true;
           });
 

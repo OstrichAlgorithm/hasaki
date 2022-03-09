@@ -77,7 +77,7 @@ class Update {
       const version = require('../../../package.json').version
 
       if(compareVersion(event.version, version) > 0){
-        this.Message(this.mainWindow, 1)
+        this.Message(this.mainWindow, 1, "https://ostrichalgorithm.github.io/hasaki/"+event.path )
       }else{
       this.Message(this.mainWindow, 2)
         
@@ -112,7 +112,7 @@ class Update {
   // 执行自动更新检查
   checkUpdate(mainWindow) {
 
-    console.log('xxxxxxxx')
+    // console.log('xxxxxxxx')
     this.mainWindow = mainWindow
     autoUpdater.checkForUpdates().catch(err => {
       console.log('网络连接问题', err)
