@@ -67,7 +67,6 @@
     "electron-updater": "^4.6.5",
     "express": "^4.17.3",
     "fs-extra": "^10.0.1",
-    "jquery": "^3.6.0",
     "node-cmd": "^5.0.0",
     "node-schedule": "^2.1.0",
     "request": "^2.88.2",
