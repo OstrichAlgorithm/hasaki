@@ -51,9 +51,8 @@ class League:
         # EndOfGame
         return self.request('get', f'/lol-gameflow/v1/gameflow-phase').json()
     def select(self, champion_id: int):
-        with ThreadPoolExecutor() as executor:
-            me = 5 if len(x := [i for i in range(0, 5) if executor.submit(self.is_me, i).result()]) == 0 else x[0]
-            self.select_champion(champion_id, me)
+        res = self.request('get', f'/lol-champ-select/v1/session').json()
+        self.select_champion(champion_id,res.localPlayerCellId)
 
 
 
