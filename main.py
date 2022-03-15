@@ -52,6 +52,7 @@ class League:
         return self.request('get', f'/lol-gameflow/v1/gameflow-phase').json()
     def select(self, champion_id: int):
         res = self.request('get', f'/lol-champ-select/v1/session').json()
+        print(res)
         self.select_champion(champion_id,res.localPlayerCellId)
 
 
@@ -67,7 +68,7 @@ if __name__ == '__main__':
     
 
     
-    t = 2 
+    t = 1
     is_select = False
     last_game_flow = ''
     while True :
