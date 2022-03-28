@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "axios": "^0.26.0",
+    "electron-baidu-tongji": "^1.0.5",
     "electron-fetch": "^1.7.4",
     "electron-updater": "^4.6.5",
     "express": "^4.17.3",

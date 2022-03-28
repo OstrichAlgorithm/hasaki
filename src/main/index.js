@@ -5,6 +5,15 @@ import initWindow from './services/windowManager'
 import DisableButton from './config/DisableButton'
 import electronDevtoolsInstaller, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
+
+
+// main/index.js
+import { ipcMain } from 'electron'
+import { ebtMain } from 'electron-baidu-tongji'
+
+const isDevelopment = process.env.NODE_ENV !== 'production'
+ebtMain(ipcMain, isDevelopment)
+
 function onAppReady () {
   initWindow()
   DisableButton.Disablef12()

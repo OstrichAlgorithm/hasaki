@@ -76,6 +76,10 @@
         <el-button :type="form.submit_running?'danger':'primary'" @click="onSubmit" >  {{form.submit_running?"停止":"运行"}}</el-button>
       </el-form-item>
 
+       <el-form-item>
+        <el-button   @click="onTest" > test</el-button>
+      </el-form-item>
+
       
     </el-form>
 
@@ -328,6 +332,21 @@ export default {
           //  that.options = that.lcu.ownedChampions()
         });
       },
+
+       onTest(){
+
+          var that = this;
+          this.lcu.summoner().then((res) =>{
+            console.log(res)
+
+              var summonerId = res.summonerId
+
+              that.lcu.matchlist(summonerId,0,10).then((res)=>{
+                console.log(res)
+              })
+
+          })
+    },
 
       changePosition(e){
         var champion_name  = this.form.champion_id?this.findTitle(this.form.champion_id):'';

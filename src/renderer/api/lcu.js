@@ -44,6 +44,13 @@ export class Lcu {
   }
 
 
+  // 
+  async summonerList(summonerIDs) {
+    return await this.request(`/lol-summoner/v2/summoners?ids=[${summonerIDs}]`)
+  }
+
+
+
   // //拥有英雄列表
   async ownedChampions() {
     var res =  await this.request('/lol-champions/v1/owned-champions-minimal', 'get')
@@ -137,6 +144,18 @@ export class Lcu {
   }
 
 
+   // 游戏对局列表
+   async matchlist(summonerID,begIndex,endIndex) {
+
+    return await this.request(`/lol-match-history/v3/matchlist/account/${summonerID}?begIndex=${begIndex}&endIndex=${endIndex}`)
+  }
+
+
+
+
+  
+
+
   // //秒选任务
   // pickTask(champion_id,ext) {
   //   var that = this;
@@ -162,7 +181,7 @@ export class Lcu {
   //     this.job = 0;
   //   }
   // }
-
+ 
 
   
 
