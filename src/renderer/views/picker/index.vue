@@ -3,6 +3,7 @@
     <el-form ref="form" :model="form" label-width="120px">
      
       <el-form-item label="英雄列表">
+        <el-col :span="18">
         <el-select v-model="form.champion_id" @change="changeChampion" placeholder="请选择英雄" filterable  :disabled="form.champion_id_disabled">
           <el-option
             v-for="item in options"
@@ -33,22 +34,31 @@
             >
           </el-option>
         </el-select>
+        </el-col>
+         
       </el-form-item>
 
       <el-form-item label="秒选喊话" label-width="120px">
-        <el-col :span="12">
+        <el-col :span="18">
           <el-input
             class="inline-input"
             v-model="form.msg"
             placeholder="请输入内容"
           >
+            <el-select   placeholder="位置"  v-model="form.position"  @change="changePosition" slot="prepend">
+              <el-option label="上单" value="上单"></el-option>
+              <el-option label="中单" value="中单"></el-option>
+              <el-option label="打野" value="打野"></el-option>
+              <el-option label="下路" value="下路"></el-option>
+              <el-option label="辅助" value="辅助"></el-option>
+            </el-select>
             <el-button slot="append" icon="el-icon-chat-line-round" type="primary" @click="sendMsg" ></el-button>
           </el-input>
-          <div class="sub-title">良好的沟通可以降低冲突概率</div>
         </el-col>
+        
       </el-form-item>
 
-       <el-form-item label="喊话位置" label-width="120px">
+       <el-form-item label="喊话位置" label-width="120px" style="display:none;">
          <el-radio-group v-model="form.position"  @change="changePosition">
          <!--<el-radio-button label="top">上单</el-radio-button>
           // <el-radio-button label="mid">中单</el-radio-button>
@@ -64,21 +74,68 @@
         </el-radio-group>
       </el-form-item>
 
+      <el-form-item label="战绩先知" style="display:none" label-width="120px">
+        <el-col :span="18">
+          <el-input
+            type="textarea"
+            class="inline-input"
+            v-model="form.info"
+           :rows="5"
+          >
+          </el-input>
+        </el-col>
+      </el-form-item>
+
+      <el-form-item label="战绩先知" label-width="120px">
+        <el-col :span="22">
+          <el-table
+            :data="form.tableData"
+            stripe
+            style="width: 100%;">
+            <el-table-column
+              prop="summoner"
+              label="召唤师">
+            </el-table-column>
+            <el-table-column
+              prop="win"
+              label="胜率">
+            </el-table-column>
+            <el-table-column
+              prop="kda"
+              label="KDA">
+            </el-table-column>
+             <el-table-column
+              prop="commonChampions"
+              label="常用英雄">
+            </el-table-column>
+
+
+            
+          </el-table>
+        </el-col>
+      </el-form-item>
+
+       
+
       
       <el-form-item label="额外选项">
         <el-checkbox-group v-model="form.ext" :disabled="form.ext_disabled" border="true">
           <el-checkbox label="accept">自动接受对局</el-checkbox>
+          <el-checkbox label="pick">秒选英雄</el-checkbox>
           <el-checkbox label="say">秒选后喊话</el-checkbox>
+          <el-checkbox label="send">自动发送队友战绩</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
 
       <el-form-item>
         <el-button :type="form.submit_running?'danger':'primary'" @click="onSubmit" >  {{form.submit_running?"停止":"运行"}}</el-button>
+
+
+        <el-button   @click="query" > 查询战绩</el-button>
+        <el-button   @click="sendInfo" > 战绩发送</el-button>
       </el-form-item>
 
-       <el-form-item>
-        <el-button   @click="onTest" > test</el-button>
-      </el-form-item>
+
 
       
     </el-form>
@@ -230,6 +287,9 @@ export default {
         submit_text:'', 
         position :'',
         msg:'',
+        url:'',
+        info:'',
+        tableData: [],
       },
       options :  [],
       job:0,
@@ -243,14 +303,14 @@ export default {
   },
   methods: {
     onSubmit() {
-      if( this.form.champion_id=="") {
-        this.$message({
-          message: "请先选择英雄！",
-          type: "warning",
-          showClose: true,
-        });
-        return false
-      }
+      // if( this.form.champion_id=="") {
+      //   this.$message({
+      //     message: "请先选择英雄！",
+      //     type: "warning",
+      //     showClose: true,
+      //   });
+      //   return false
+      // }
 
       this.form.submit_running = !this.form.submit_running
       this.form.champion_id_disabled = this.form.submit_running
@@ -348,6 +408,170 @@ export default {
           })
     },
 
+       onTest1(){
+          var that = this;
+          this.lcu.getActionId().then((res) =>{
+            console.log(res)
+
+
+          })
+
+
+       
+    },
+
+     query(){
+          var that = this;
+          that.form.info ="";
+          that.form.tableData =[];
+          var black_list  = []; 
+        
+          that.lcu.getCurrConversationID().then((res) =>{
+            console.log(res)
+            that.lcu.listConversationMsg(res[res.length-1].id).then((res) =>{
+              var ids = [];
+              for(var i in res){
+                if( ids.indexOf(res[i].fromSummonerId) != -1){
+                  continue;
+                }else{
+                  ids.push(res[i].fromSummonerId)
+                }
+
+                that.lcu.matchlist(res[i].fromSummonerId,0,20).then((res)=>{
+                  var summonerName = res.games.games[0].participantIdentities[0].player.summonerName;
+                  that.form.info +=summonerName+':'; 
+                  console.log(res)
+                  //胜率
+                  var win = that.win(res.games.games);
+                  console.log('win---',win)
+                  that.form.info += '胜率:'+win+'--'; 
+                  //kda
+                  var kda = that.kda(res.games.games);
+                  console.log('kda---',kda)
+                  that.form.info += 'KDA:'+kda+'--'; 
+                  //常用英雄 
+                  var commonChampions = that.commonChampions(res.games.games);
+                  console.log('commonChampions---',commonChampions)
+                  if(commonChampions.length)
+                     that.form.info += '常用:'; 
+                  var commonChampionsStr = '';
+                  for(var i in commonChampions){
+                    if(i> 2) break;
+                    that.form.info += '常用:'+commonChampions[i]; 
+                    commonChampionsStr+=commonChampions[i]+' '
+                  }
+                  that.form.info += '\n'; 
+                  //列表数据
+                  that.form.tableData.push({
+                    'summoner': summonerName,
+                    'kda': kda,
+                    'win': win,
+                    'commonChampions': commonChampionsStr
+                  })
+
+                  //开黑列表
+                  // for(var i in res){
+                  //   black_list[res.games.games[i].gameId][] =summonerName;   
+                  // }
+                })
+              }
+
+
+              // that.black(black_list);
+
+            })
+          })
+          console.log( that.form.tableData)
+
+    },
+
+    sendInfo(){
+        var that = this; 
+        var info = that.form.info.split('\n')
+        // console.log(info)
+        this.lcu.getCurrConversationID().then((res)=>{
+          for(var i in info){
+            that.lcu.sendConversationMsg(info[i], res[res.length-1].id )
+          }
+          that.lcu.sendConversationMsg('------来自英雄秒选器~dou~音KF李~干啥程序员' , res[res.length-1].id )
+        })
+    },
+
+
+    //开黑
+    black(list){
+
+      // var list = [
+      //   "1":['a','b'],
+      //   "2":['a','b'],
+      //   "3":['a','b'],
+      //   "4":['a'],
+      //   "5":['v'],
+      // ]
+        
+      // for(var i in list){
+      //   if(list[i].length>1){
+      //     //开黑
+      //   }
+      // }
+    },
+
+    //计算胜率
+    win(games){
+      var win =0;
+      var len = games.length;
+      for(var i in games){
+        if(games[i].participants[0].stats.win){
+          win+=1;
+        }
+        // console.log((kills+assists)/deaths*3)
+      }
+      return  (win/len*100.00).toFixed(2)+"%"; 
+    },
+    
+
+    //计算场均kda
+    kda(games){
+      var kda =0.00;
+      var len = games.length;
+      for(var i in games){
+        var kills   = games[i].participants[0].stats.kills;
+        var deaths  = games[i].participants[0].stats.deaths;
+        var assists = games[i].participants[0].stats.assists;
+        deaths = deaths==0?1:deaths;
+        kda += (kills+assists)/deaths*3;
+        // console.log((kills+assists)/deaths*3)
+      }
+      return  (kda/len).toFixed(2); 
+    },
+
+    //计算常用英雄
+    commonChampions(games){
+      var championIds =[];
+      for(var i in games){
+        championIds.push(games[i].participants[0].championId)
+      }
+      var map = championIds.reduce((m, x) => m.set(x, (m.get(x) || 0) + 1), new Map()); 
+      var arr_obj = Array.from(map);
+      arr_obj.sort((x,y)=>{return y[1]-x[1];})
+      // map = new Map(arr_obj.map(i=>[i[0],i[1]]) )
+      // console.log(map)
+      var champions =[];
+      for(var i in arr_obj){
+        champions.push(this.lcu.getChampionName(arr_obj[i][0]+''));
+      }
+      return champions;
+    },
+
+     
+
+    doRequest(){
+          this.lcu.do(this.form.url).then((res) =>{
+           console.log(res)
+          })
+    },
+
+
       changePosition(e){
         var champion_name  = this.form.champion_id?this.findTitle(this.form.champion_id):'';
         this.form.msg = '我想玩'+e+champion_name+",谢谢各位大哥！！！！！";
@@ -385,6 +609,10 @@ export default {
         this.ext_accept = this.form.ext.indexOf('accept') >-1?true:false;
         // 秒选喊话
         this.ext_say = this.form.ext.indexOf('say') >-1?true:false;
+         // 秒选
+        this.ext_pick = this.form.ext.indexOf('pick') >-1?true:false;
+         //  自动发送队友战绩
+        this.ext_send = this.form.ext.indexOf('send') >-1?true:false;
 
         if (this.job==0) {
           this.job = setInterval(async function (that) {
@@ -402,17 +630,30 @@ export default {
             } else if (that.last_game_flow != 'ChampSelect' && that.game_flow == 'ChampSelect') {
               //选人阶段 秒选
               // 得到位置号
-              const id = await that.lcu.getActionId()
-              if (id > -1) {
-                // console.log(ext)
-                if(that.ext_say){
-                  //高情商自动喊话
-                  that.sendMsg()
+
+              if(that.ext_pick){
+                const id = await that.lcu.getActionId()
+                if (id > -1) {
+                  // console.log(ext)
+                  if(that.ext_say){
+                    //高情商自动喊话
+                    that.sendMsg()
+                  }
+                  //秒选英雄
+                  await that.lcu.selectChampion(that.form.champion_id, id)
                 }
-                //秒选英雄
-                await that.lcu.selectChampion(that.form.champion_id, id)
-                
               }
+              
+              //查询队友战绩
+               setTimeout(function(){
+                    that.query();
+                    if(that.ext_send){
+                       setTimeout(function(){
+                         that.sendInfo();
+                      },1500) 
+                    }
+                },3000) 
+             
             }
             that.last_game_flow = that.game_flow
           }, 1500, that);

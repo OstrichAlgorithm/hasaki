@@ -1,13 +1,15 @@
 // 仅示例
 import axios from 'axios'
-import { list } from 'postcss';
+// import { list } from 'postcss';
 import nickname from "../utils/nickname"
+import list from "../utils/list"
 export class Lcu {
   game_flow = '';
   last_game_flow = '';
   champion_id = 0;
   job = 0;
   ext_accept= false;
+  // list = {};
   constructor(token,port) {
     this.token = token;
     this.port  = port;
@@ -50,6 +52,15 @@ export class Lcu {
   }
 
 
+  getChampionName(championIds){
+    championIds = championIds+'';
+    console.log(list[championIds],championIds) 
+
+   
+    return  typeof(list[championIds]) == "undefined"?'未知':list[championIds];
+    // return list[championIds]
+  }
+
 
   // //拥有英雄列表
   async ownedChampions() {
@@ -57,6 +68,7 @@ export class Lcu {
     //  console.log(res)
     //整理数据
     var data = [];
+    // var list = {};
     for (var a of res) {
       data.push({
         "alias": a.alias,
@@ -67,8 +79,9 @@ export class Lcu {
         "title": a.title,
         "label": a.name + '-' + a.title + '-' + a.alias+ '-'+nickname[a.alias].join('-'),
       });
+      // list[a.id] =  a.title;
     }
-
+    // this.list = list
     // console.log(data)
     return data;
   }
@@ -106,6 +119,7 @@ export class Lcu {
   // 得到位置id 
   async getActionId() {
     var  res=  await this.request('/lol-champ-select/v1/session');
+    console.log(res)
     return res.localPlayerCellId
   }
 
@@ -119,12 +133,12 @@ export class Lcu {
 
 
 
-  // // 获取会话组消息记录
-  // async listConversationMsg(conversationID) {
-  //     list = await this.request(`/lol-chat/v1/conversations/${conversationID}/messages`)
-  //     console.log(list)
-  //   	return list
-  //  }
+  // 获取会话组消息记录
+  async listConversationMsg(conversationID) {
+    var list = await this.request(`/lol-chat/v1/conversations/${conversationID}/messages`)
+      // console.log(list)
+    	return list
+   }
 
   // 获取当前对局聊天组
   async getCurrConversationID() {
@@ -148,6 +162,12 @@ export class Lcu {
    async matchlist(summonerID,begIndex,endIndex) {
 
     return await this.request(`/lol-match-history/v3/matchlist/account/${summonerID}?begIndex=${begIndex}&endIndex=${endIndex}`)
+  }
+
+
+
+  async do(url, type="GET") {
+    return await this.request(url,type)
   }
 
 
