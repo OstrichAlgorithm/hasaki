@@ -1,4 +1,4 @@
-baseurl = "https://doks.netlify.app/"
+baseurl = "https://yoopo.gitee.io/hasaki/"
 canonifyURLs = false
 disableAliases = true
 disableHugoGeneratorInject = true
