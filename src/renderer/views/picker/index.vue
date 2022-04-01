@@ -14,15 +14,11 @@
           >
 
             <span style="float: left">
-
-
             <el-image
               style="width: 128px; height: 72px"
               :src="'https://127.0.0.1:'+auth.port+item.baseSplashPath"
               :fit="contain"
             ></el-image>
-            
-            
             </span>
             <span
               style="
@@ -452,12 +448,12 @@ export default {
                   //常用英雄 
                   var commonChampions = that.commonChampions(res.games.games);
                   console.log('commonChampions---',commonChampions)
-                  if(commonChampions.length)
-                     that.form.info += '常用:'; 
+                  // if(commonChampions.length)
+                  that.form.info += '常用:'; 
                   var commonChampionsStr = '';
                   for(var i in commonChampions){
                     if(i> 2) break;
-                    that.form.info += '常用:'+commonChampions[i]; 
+                    that.form.info += commonChampions[i]+' '; 
                     commonChampionsStr+=commonChampions[i]+' '
                   }
                   that.form.info += '\n'; 
