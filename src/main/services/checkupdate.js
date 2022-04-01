@@ -33,14 +33,12 @@ function compareVersion(v1, v2) {
 
 
 
-
-
 class Update {
   mainWindow
   constructor() {
     // autoUpdater.setFeedURL('http://127.0.0.1:8080/')
-    autoUpdater.setFeedURL('https://ostrichalgorithm.github.io/hasaki/')
-    // 
+    // autoUpdater.setFeedURL('https://ostrichalgorithm.github.io/hasaki/')
+    autoUpdater.setFeedURL('https://yoopo.gitee.io/hasaki/')
 
     // 当更新发生错误的时候触发。
     autoUpdater.on('error', (err) => {
@@ -77,13 +75,12 @@ class Update {
       const version = require('../../../package.json').version
 
       if(compareVersion(event.version, version) > 0){
-        this.Message(this.mainWindow, 1, "https://ostrichalgorithm.github.io/hasaki/"+event.path )
-      }else{
-      this.Message(this.mainWindow, 2)
+        // this.Message(this.mainWindow, 1, "https://ostrichalgorithm.github.io/hasaki/"+event.path )
+        this.Message(this.mainWindow, 1, "https://gitee.com/yoopo/hasaki/"+event.path )
         
+      }else{
+        this.Message(this.mainWindow, 2)
       }
-
-
     })
 
     // 下载监听
@@ -93,7 +90,7 @@ class Update {
 
     // 下载完成
     autoUpdater.on('update-downloaded', () => {
-      console.log('done')
+      // console.log('done')
       this.Message(this.mainWindow, 4)
     })
   }

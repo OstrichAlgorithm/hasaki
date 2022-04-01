@@ -14,7 +14,7 @@ os.arch().includes('64') ? Sysarch = 'win64' : Sysarch = 'win32'
 // 识别操作系统
 // linux自己修改后缀名哦，我没有linux就没有测试了
 if (os.platform().includes('win32')) {
-  defaultDownloadUrL = baseUrl + `hasaki-${version}.exe?${new Date().getTime()}`
+  defaultDownloadUrL = baseUrl + `hasaki Setup ${version}.exe?${new Date().getTime()}`
 } else if (os.platform().includes('linux')) {
   defaultDownloadUrL = baseUrl + `electron_${version}_${Sysarch}?${new Date().getTime()}`
 } else {
@@ -22,9 +22,11 @@ if (os.platform().includes('win32')) {
 }
 export default {
   download(mainWindow, downloadUrL) {
-    console.log(downloadUrL,defaultDownloadUrL) 
-    mainWindow.webContents.downloadURL(downloadUrL || defaultDownloadUrL)
+    console.log(downloadUrL) 
+    mainWindow.webContents.downloadURL(downloadUrL)
     mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
+      // console.log(item) 
+
       //   将文件保存在系统的下载目录
       const filePath = path.join(app.getPath('downloads'), item.getFilename())
       console.log(filePath) 
@@ -48,6 +50,7 @@ export default {
       })
       // 下载完成或失败
       item.once('done', (event, state) => {
+        // console.log(event)
         switch (state) {
           case 'completed':
             const data = {
