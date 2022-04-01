@@ -1,10 +1,10 @@
 # Meta Data for SEO
 
 ## Homepage
-title = "Doks"
+title = "hasaki"
 titleSeparator = "-"
-titleAddition = "Modern Documentation Theme"
-description = "Doks is a Hugo theme for building secure, fast, and SEO-ready documentation websites, which you can easily update and customize."
+titleAddition = "lol英雄秒选器"
+description = "lol英雄秒选器，自动接受对局，队友战绩查询，队友鉴定"
 
 ## Documentation
 # docsVersion = "0.3"
