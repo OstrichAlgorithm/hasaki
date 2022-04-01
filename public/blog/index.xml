@@ -2,10 +2,10 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>博客 on </title>
-    <link>https://doks.netlify.app/blog/</link>
+    <link>https://yoopo.gitee.io/hasaki/blog/</link>
     <description>Recent content in 博客 on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Tue, 06 Oct 2020 08:49:55 +0000</lastBuildDate><atom:link href="https://doks.netlify.app/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 06 Oct 2020 08:49:55 +0000</lastBuildDate><atom:link href="https://yoopo.gitee.io/hasaki/blog/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

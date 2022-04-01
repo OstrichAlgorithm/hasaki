@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Modern Documentation Theme on </title>
-    <link>https://doks.netlify.app/en/</link>
+    <link>https://yoopo.gitee.io/hasaki/en/</link>
     <description>Recent content in Modern Documentation Theme on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Copyright (c) 2020-2021 Henk Verlinde</copyright>
     <lastBuildDate>Tue, 06 Oct 2020 08:47:36 +0000</lastBuildDate>
     
-        <atom:link href="https://doks.netlify.app/en/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="https://yoopo.gitee.io/hasaki/en/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Blog</title>
-      <link>https://doks.netlify.app/en/blog/</link>
+      <link>https://yoopo.gitee.io/hasaki/en/blog/</link>
       <pubDate>Tue, 06 Oct 2020 08:49:55 +0000</pubDate>
       
-      <guid>https://doks.netlify.app/en/blog/</guid>
+      <guid>https://yoopo.gitee.io/hasaki/en/blog/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Docs</title>
-      <link>https://doks.netlify.app/en/docs/</link>
+      <link>https://yoopo.gitee.io/hasaki/en/docs/</link>
       <pubDate>Tue, 06 Oct 2020 08:48:23 +0000</pubDate>
       
-      <guid>https://doks.netlify.app/en/docs/</guid>
+      <guid>https://yoopo.gitee.io/hasaki/en/docs/</guid>
       <description></description>
     </item>
     

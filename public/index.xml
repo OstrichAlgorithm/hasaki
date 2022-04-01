@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>lol英雄秒选器 on </title>
-    <link>https://doks.netlify.app/</link>
+    <link>https://yoopo.gitee.io/hasaki/</link>
     <description>Recent content in lol英雄秒选器 on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
     <copyright>Copyright (c) 2020-2021 Henk Verlinde</copyright>
     <lastBuildDate>Tue, 06 Oct 2020 08:47:36 +0000</lastBuildDate>
     
-        <atom:link href="https://doks.netlify.app/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="https://yoopo.gitee.io/hasaki/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>博客</title>
-      <link>https://doks.netlify.app/blog/</link>
+      <link>https://yoopo.gitee.io/hasaki/blog/</link>
       <pubDate>Tue, 06 Oct 2020 08:49:55 +0000</pubDate>
       
-      <guid>https://doks.netlify.app/blog/</guid>
+      <guid>https://yoopo.gitee.io/hasaki/blog/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Docs</title>
-      <link>https://doks.netlify.app/docs/</link>
+      <link>https://yoopo.gitee.io/hasaki/docs/</link>
       <pubDate>Tue, 06 Oct 2020 08:48:23 +0000</pubDate>
       
-      <guid>https://doks.netlify.app/docs/</guid>
+      <guid>https://yoopo.gitee.io/hasaki/docs/</guid>
       <description></description>
     </item>
     

@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Blog on </title>
-    <link>https://doks.netlify.app/en/blog/</link>
+    <link>https://yoopo.gitee.io/hasaki/en/blog/</link>
     <description>Recent content in Blog on </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Tue, 06 Oct 2020 08:49:55 +0000</lastBuildDate><atom:link href="https://doks.netlify.app/en/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 06 Oct 2020 08:49:55 +0000</lastBuildDate><atom:link href="https://yoopo.gitee.io/hasaki/en/blog/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Say hello to Doks 👋</title>
-      <link>https://doks.netlify.app/en/blog/say-hello-to-doks/</link>
+      <link>https://yoopo.gitee.io/hasaki/en/blog/say-hello-to-doks/</link>
       <pubDate>Wed, 04 Nov 2020 09:19:42 +0100</pubDate>
       
-      <guid>https://doks.netlify.app/en/blog/say-hello-to-doks/</guid>
+      <guid>https://yoopo.gitee.io/hasaki/en/blog/say-hello-to-doks/</guid>
       <description></description>
     </item>
     
