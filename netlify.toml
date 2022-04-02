@@ -25,7 +25,7 @@
   package = "netlify-plugin-submit-sitemap"
 
 	[plugins.inputs]
-    baseUrl = "https://yoopo.gitee.io/hasaki/"
+    baseUrl = "https://ostrichalgorithm.github.io/hasaki/"
     sitemapPath = "/sitemap.xml"
     ignorePeriod = 0
     providers = [
