@@ -1,6 +1,6 @@
 {
   "name": "hasaki",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "KFLee~干啥程序员 <https://github.com/OstrichAlgorithm>",
   "description": "hasaki-lol秒选助手",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "https://gitee.com/yoopo/hasaki/"
+        "url": "https://ostrichalgorithm.github.io/hasaki/"
       }
     ],
     "productName": "hasaki",
@@ -65,6 +65,7 @@
     "axios": "^0.26.0",
     "electron-baidu-tongji": "^1.0.5",
     "electron-fetch": "^1.7.4",
+    "electron-log": "^4.4.6",
     "electron-updater": "^4.6.5",
     "express": "^4.17.3",
     "fs-extra": "^10.0.1",
