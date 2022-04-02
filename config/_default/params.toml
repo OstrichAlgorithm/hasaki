@@ -4,7 +4,7 @@
 title = "hasaki"
 titleSeparator = "-"
 titleAddition = "lol英雄秒选器"
-description = "lol英雄秒选器，自动接受对局，队友战绩查询，队友鉴定"
+description = "lol英雄秒选器，自动接受对局，队友战绩查询，队友上等马下等马鉴定"
 
 ## Documentation
 # docsVersion = "0.3"
