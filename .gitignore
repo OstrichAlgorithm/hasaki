@@ -3,3 +3,5 @@ bak
 resources
 dist
 build
+.netlify
+.hugo_build.lock

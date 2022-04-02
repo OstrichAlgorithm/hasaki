@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+    <url>
+      <loc>https://ostrichalgorithm.github.io/hasaki/blog/hello-world/</loc>
+      <lastmod>2022-04-02T09:19:42+01:00</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.5</priority>
+      <xhtml:link
+                  rel="alternate"
+                  hreflang="en"
+                  href="https://ostrichalgorithm.github.io/hasaki/en/blog/say-hello-to-doks/"
+                  />
+      <xhtml:link
+                  rel="alternate"
+                  hreflang="zh"
+                  href="https://ostrichalgorithm.github.io/hasaki/blog/hello-world/"
+                  />
+    </url>
+    </urlset>
