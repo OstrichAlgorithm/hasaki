@@ -20,16 +20,24 @@ if (os.platform().includes('win32')) {
 } else {
   defaultDownloadUrL = baseUrl + `electron_${version}_mac.dmg?${new Date().getTime()}`
 }
+
+
+const log = require('electron-log')
+
+
 export default {
   download(mainWindow, downloadUrL) {
     console.log(downloadUrL) 
     mainWindow.webContents.downloadURL(downloadUrL)
+    log.warn(filePath)
     mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
-      // console.log(item) 
+      log.warn(item.getFilename()) 
 
       //   将文件保存在系统的下载目录
-      const filePath = path.join(app.getPath('downloads'), item.getFilename())
+      const filePath = path.join(app.getPath('desktop'), item.getFilename())
       console.log(filePath) 
+      log.warn(filePath)
+
       // 自动保存
       item.setSavePath(filePath)
       // 下载进度
@@ -51,6 +59,7 @@ export default {
       // 下载完成或失败
       item.once('done', (event, state) => {
         // console.log(event)
+        log.warn(event)
         switch (state) {
           case 'completed':
             const data = {

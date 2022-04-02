@@ -228,7 +228,7 @@ export default {
             message: "已检查到新版本，开始下载",
              showClose: true,
           });
-          // this.dialogVisible = true;
+          this.dialogVisible = true;
           this.CheckUpdate('two',age.msg)
           break;
         case 2:
@@ -335,7 +335,7 @@ export default {
 
           break;
         case "two":
-        // console.log(url)
+        console.log(url)
           ipcRenderer.invoke("start-download",url).then(() => {
             this.dialogVisible = true;
           });

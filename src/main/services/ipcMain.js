@@ -25,10 +25,12 @@ export default {
     ipcMain.handle('window-close', (event, args) => {
       BrowserWindow.fromWebContents(event.sender)?.close()
     })
-    ipcMain.handle('start-download', (event, msg) => {
+    ipcMain.handle('start-download', (event, args) => {
       // console.log('--',msg)
+      const log = require('electron-log')
+      log.warn(args)
       // downloadFile.download(BrowserWindow.fromWebContents(event.sender), msg.downloadUrL)
-      downloadFile.download(BrowserWindow.fromWebContents(event.sender),msg)
+      downloadFile.download(BrowserWindow.fromWebContents(event.sender),args)
     })
     ipcMain.handle('check-update', (event, args) => {
       updater.checkUpdate(BrowserWindow.fromWebContents(event.sender))
