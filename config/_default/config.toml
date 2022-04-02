@@ -1,4 +1,4 @@
-baseurl = "https://yoopo.gitee.io/hasaki/"
+baseurl = "https://ostrichalgorithm.github.io/hasaki/"
 canonifyURLs = false
 disableAliases = true
 disableHugoGeneratorInject = true
