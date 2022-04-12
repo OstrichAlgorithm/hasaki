@@ -1,8 +1,10 @@
-// 仅示例
 import axios from 'axios'
 // import { list } from 'postcss';
 import nickname from "../utils/nickname"
 import list from "../utils/list"
+import summoner_skill_list from "../utils/summoner_skill_list"
+
+
 export class Lcu {
   game_flow = '';
   last_game_flow = '';
@@ -54,9 +56,7 @@ export class Lcu {
 
   getChampionName(championIds){
     championIds = championIds+'';
-    console.log(list[championIds],championIds) 
-
-   
+    // console.log(list[championIds],championIds) 
     return  typeof(list[championIds]) == "undefined"?'未知':list[championIds];
     // return list[championIds]
   }
@@ -108,6 +108,19 @@ export class Lcu {
     return await this.request('/lol-champ-select/v1/session/actions/' + action_id, 'patch', data)
   }
 
+
+  //选择召唤师 技能  --皮肤 
+  async selectSummonerSkill(spell1Id,spell2Id) {
+    var data = {
+      // "selectedSkinId": 0,
+      "spell1Id": spell1Id,
+      "spell2Id": spell2Id,
+      // "wardSkinId": 0
+    }
+    return await this.request('/lol-champ-select/v1/session/my-selection', 'patch', data)
+  }
+
+
   // //接受对局
   async accept() {
     // console.log('accept')
@@ -118,9 +131,13 @@ export class Lcu {
 
   // 得到位置id 
   async getActionId() {
-    var  res=  await this.request('/lol-champ-select/v1/session');
-    console.log(res)
+    var  res=  await this.session();
     return res.localPlayerCellId
+  }
+  // 得到组队情况
+  async session() {
+    var  res=  await this.request('/lol-champ-select/v1/session');
+  return res ;
   }
 
   //选英雄
@@ -166,8 +183,16 @@ export class Lcu {
 
 
 
-  async do(url, type="GET") {
-    return await this.request(url,type)
+  // 召唤师技能列表 
+  getSummonerSkillList(){
+    return summoner_skill_list;
+  }
+
+  
+
+
+  async do(url, type="GET",data={}) {
+    return await this.request(url,type,data)
   }
 
 

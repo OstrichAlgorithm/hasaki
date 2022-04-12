@@ -3,33 +3,84 @@
     <el-form ref="form" :model="form" label-width="120px">
      
       <el-form-item label="英雄列表">
-        <el-col :span="18">
-        <el-select v-model="form.champion_id" @change="changeChampion" placeholder="请选择英雄" filterable  :disabled="form.champion_id_disabled">
-          <el-option
-            v-for="item in options"
-            :key="item.id"
-            :value="item.id"
-            :label="item.label"
-            style="height:72px"
-          >
-
-            <span style="float: left">
-            <el-image
-              style="width: 128px; height: 72px"
-              :src="'https://127.0.0.1:'+auth.port+item.baseSplashPath"
-              :fit="contain"
-            ></el-image>
-            </span>
-            <span
-              style="
-                float: right;
-                color: var(--el-text-color-secondary);
-                font-size: 13px;
-              "
-              >{{ item.name+'-'+ item.title+'-'+item.alias }}</span
+        <el-col :span="10">
+          <el-select v-model="form.champion_id" @change="changeChampion" placeholder="请选择英雄" filterable  :disabled="form.champion_id_disabled">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :value="item.id"
+              :label="item.label"
+              style="height:72px"
             >
-          </el-option>
-        </el-select>
+              <span style="float: left">
+              <el-image
+                style="width: 128px; height: 72px"
+                :src="'https://127.0.0.1:'+auth.port+item.baseSplashPath"
+                :fit="contain"
+              ></el-image>
+              </span>
+              <span
+                style="
+                  float: right;
+                  color: var(--el-text-color-secondary);
+                  font-size: 13px;
+                "
+                >{{ item.name+'-'+ item.title+'-'+item.alias }}</span
+              >
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="4"  style="display:none;">
+          <el-select v-model="form.spell1Id" placeholder="D"  :disabled="form.champion_id_disabled">
+            <el-option
+              v-for="item in summoner_skill_list"
+              :key="item.id"
+              :value="item.id"
+              :label="item.name"
+            >
+              <span style="float: left">
+                <el-image
+                  style="width: 24px; height: 24px"
+                  :src="item.icon"
+                  :fit="contain"
+                ></el-image>
+              </span>
+              <span
+                style="
+                  float: right;
+                  color: var(--el-text-color-secondary);
+                  font-size: 13px;
+                "
+                >{{ item.name }}</span>
+             
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="4"  style="display:none;">
+          <el-select v-model="form.spell2Id" placeholder="F"  :disabled="form.champion_id_disabled">
+            <el-option
+              v-for="item in summoner_skill_list"
+              :key="item.id"
+              :value="item.id"
+              :label="item.name"
+            >
+              <span style="float: left">
+                <el-image
+                  style="width: 24px; height: 24px"
+                  :src="item.icon"
+                  :fit="contain"
+                ></el-image>
+              </span>
+              <span
+                style="
+                  float: right;
+                  color: var(--el-text-color-secondary);
+                  font-size: 13px;
+                "
+                >{{ item.name }}</span>
+             
+            </el-option>
+          </el-select>
         </el-col>
          
       </el-form-item>
@@ -91,6 +142,16 @@
             <el-table-column
               prop="summoner"
               label="召唤师">
+              <template slot-scope="scope">
+                {{ scope.row.summoner }}
+                 <el-tag
+                  v-if="scope.row.black>1"
+                  key="scope.row.black"
+                  type="dander"
+                  effect="dark">
+                  {{ scope.row.black }}黑
+                </el-tag>
+              </template>
             </el-table-column>
             <el-table-column
               prop="win"
@@ -102,13 +163,34 @@
             </el-table-column>
              <el-table-column
               prop="commonChampions"
-              label="常用英雄">
+              label="绝活">
             </el-table-column>
 
 
             
           </el-table>
         </el-col>
+      </el-form-item>
+
+       <el-form-item label="url" label-width="120px"  style="display:none;">
+        <el-col :span="18">
+          <el-input
+            class="inline-input"
+            v-model="form.url"
+            placeholder="请输入内容"
+          >
+          <el-select   placeholder="方法"  v-model="form.methods"  slot="prepend">
+              <el-option label="get" value="get"></el-option>
+              <el-option label="post" value="post"></el-option>
+              <el-option label="put" value="put"></el-option>
+              <el-option label="delete" value="delete"></el-option>
+              <el-option label="dispatch" value="dispatch"></el-option>
+            </el-select>
+          
+            <el-button slot="append" icon="el-icon-chat-line-round" type="primary" @click="doRequest" ></el-button>
+          </el-input>
+        </el-col>
+        
       </el-form-item>
 
        
@@ -118,8 +200,10 @@
         <el-checkbox-group v-model="form.ext" :disabled="form.ext_disabled" border="true">
           <el-checkbox label="accept">自动接受对局</el-checkbox>
           <el-checkbox label="pick">秒选英雄</el-checkbox>
+          <el-checkbox label="spell" style="display:none;">设置召唤师技能</el-checkbox>
           <el-checkbox label="say">秒选后喊话</el-checkbox>
           <el-checkbox label="send">自动发送队友战绩</el-checkbox>
+          <el-checkbox label="black">自动发送开黑信息</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
 
@@ -129,6 +213,9 @@
 
         <el-button   @click="query" > 查询战绩</el-button>
         <el-button   @click="sendInfo" > 战绩发送</el-button>
+        <el-button   @click="sendBlack" > 开黑发送</el-button>
+
+        <el-button   @click="onTest"   style="display:none;"> onTest</el-button>
       </el-form-item>
 
 
@@ -155,7 +242,6 @@
     </el-dialog>
   </div>
 
-
 </template>
 
 <script>
@@ -163,15 +249,16 @@
 import { ipcRenderer , shell } from "electron";
 import { Lcu } from "@/api/lcu"
 
+
+
+
 export default {
+  components: {
+    },
   mounted() {
     this.init()
-
-
-
   },
   created() {
- 
     ipcRenderer.on("download-progress", (event, arg) => {
       this.percentage = Number(arg);
     });
@@ -273,9 +360,17 @@ export default {
         port:'',
         url_with_auth:'',
       },
+      summoner_skill_list:[
+        // {
+        //   "id":1,
+        //   "name":'d'
+        // }
+      ],
       form: {
         champion_title:'',
         champion_id: "",
+        spell1Id:0,
+        spell2Id:0,
         champion_id_disabled:false,
         ext: [],
         ext_disabled:false,
@@ -285,8 +380,17 @@ export default {
         msg:'',
         url:'',
         info:'',
-        tableData: [],
+        tableData: [
+          // {
+          // 'summoner': '11',
+          //           'black': 1,
+          //           'kda': 1,
+          //           'win': 1,
+          //           'commonChampions': '1'}
+        ],
+        black_list:[],
       },
+      black_list:{},
       options :  [],
       job:0,
       game_flow:'',
@@ -360,6 +464,9 @@ export default {
       setInterval(function(){
         return  that.updateAuth()
       },20000)
+
+      
+
     },
    
       getAuth(){
@@ -370,9 +477,14 @@ export default {
           that.lcu.url_with_auth = res.url_with_auth;
             that.lcu.ownedChampions().then((res)=>{
               that.options =  res
+
             })
+
+            that.summoner_skill_list =  that.lcu.getSummonerSkillList();
+
           //  that.options = that.lcu.ownedChampions()
-        });
+        });       
+        
       },
 
        updateAuth(){
@@ -390,18 +502,23 @@ export default {
       },
 
        onTest(){
-
           var that = this;
-          this.lcu.summoner().then((res) =>{
-            console.log(res)
 
-              var summonerId = res.summonerId
+          // console.log(that.lcu.getSummonerSkillList())
+          // this.lcu.do("/lol-champ-select/v1/session/my-selection","PATCH",{
+          //   "spell1Id": 1,
+          //   "spell2Id": 14,
+          // })
+          // this.lcu.summoner().then((res) =>{
+          //   console.log(res)
 
-              that.lcu.matchlist(summonerId,0,10).then((res)=>{
-                console.log(res)
-              })
+          //     var summonerId = res.summonerId
 
-          })
+          //     that.lcu.matchlist(summonerId,0,10).then((res)=>{
+          //       console.log(res)
+          //     })
+
+          // })
     },
 
        onTest1(){
@@ -420,64 +537,115 @@ export default {
           var that = this;
           that.form.info ="";
           that.form.tableData =[];
-          var black_list  = []; 
+          var black_list  = {}; 
+
+          that.black_list= {}
         
           that.lcu.getCurrConversationID().then((res) =>{
             console.log(res)
             that.lcu.listConversationMsg(res[res.length-1].id).then((res) =>{
               var ids = [];
               for(var i in res){
+                if(res[i].type!== 'system'){
+                  continue;
+                }
                 if( ids.indexOf(res[i].fromSummonerId) != -1){
                   continue;
                 }else{
                   ids.push(res[i].fromSummonerId)
                 }
-
                 that.lcu.matchlist(res[i].fromSummonerId,0,20).then((res)=>{
+                  var str = '';
                   var summonerName = res.games.games[0].participantIdentities[0].player.summonerName;
-                  that.form.info +=summonerName+':'; 
-                  console.log(res)
+                  str +=summonerName+'    '; 
+                  // console.log(res)
                   //胜率
                   var win = that.win(res.games.games);
-                  console.log('win---',win)
-                  that.form.info += '胜率:'+win+'--'; 
+                  // console.log('win---',win)
+                  str += '胜率:'+win+'    '; 
                   //kda
                   var kda = that.kda(res.games.games);
-                  console.log('kda---',kda)
-                  that.form.info += 'KDA:'+kda+'--'; 
+                  // console.log('kda---',kda)
+                  str += 'KDA:'+kda+'    '; 
+                  //评价
+                  str = "("+that.evaluate(kda)+")"+str+"    ";
                   //常用英雄 
                   var commonChampions = that.commonChampions(res.games.games);
-                  console.log('commonChampions---',commonChampions)
+                  // console.log('commonChampions---',commonChampions)
                   // if(commonChampions.length)
-                  that.form.info += '常用:'; 
+                 str += '绝活:'; 
                   var commonChampionsStr = '';
                   for(var i in commonChampions){
                     if(i> 2) break;
-                    that.form.info += commonChampions[i]+' '; 
+                    str+=commonChampions[i]+' '
                     commonChampionsStr+=commonChampions[i]+' '
                   }
-                  that.form.info += '\n'; 
+                  that.form.info += str+'\n'; 
                   //列表数据
                   that.form.tableData.push({
                     'summoner': summonerName,
+                    'black': 1,
                     'kda': kda,
                     'win': win,
                     'commonChampions': commonChampionsStr
                   })
 
                   //开黑列表
-                  // for(var i in res){
-                  //   black_list[res.games.games[i].gameId][] =summonerName;   
-                  // }
+                  var gameId = ''; 
+                  for(var i in res.games.games){
+                    // console.log( res.games.games[i])
+                    gameId = res.games.games[i].gameId;
+                     if( that.black_list[gameId]==undefined){
+                         that.black_list[gameId]=[summonerName];  
+                      
+                    }else if( that.black_list[gameId].indexOf(summonerName)==-1){
+                         that.black_list[gameId].push(summonerName);  
+                    }
+                    //  console.log(that.black_list)
+                  }
                 })
               }
+              // console.log( that.black_list)
+              //开黑列表
+              // black_list = that.black(black_list);
+              // that.form.black_list = black_list
+              // for(var i in black_list){
+              //   var len = black_list[i].length;
+              //   // var tag = len+"黑";
+              //   for(var x in black_list[i]){
+              //     for(var y in that.form.tableData){
+              //       if( black_list[i][x]== that.form.tableData[y]['summoner']){
+              //         that.form.tableData[y]['black'] = len; 
+              //         break;
+              //       }
 
+              //     }
+              //   }
+              // }
 
-              // that.black(black_list);
+              
 
             })
           })
-          console.log( that.form.tableData)
+          setTimeout(function(){
+             // 开黑列表
+              var black_list = that.black(that.black_list);
+              console.log(black_list)
+              that.form.black_list = black_list
+              for(var i in black_list){
+                var len = black_list[i].length;
+                // var tag = len+"黑";
+                for(var x in black_list[i]){
+                  for(var y in that.form.tableData){
+                    if( black_list[i][x]== that.form.tableData[y]['summoner']){
+                      that.form.tableData[y]['black'] = len; 
+                      // break;
+                    }
+
+                  }
+                }
+              }
+          },3000)
 
     },
 
@@ -489,27 +657,71 @@ export default {
           for(var i in info){
             that.lcu.sendConversationMsg(info[i], res[res.length-1].id )
           }
-          that.lcu.sendConversationMsg('------来自英雄秒选器~dou~音KF李~干啥程序员' , res[res.length-1].id )
+          that.lcu.sendConversationMsg('------来自英雄秒选器~公众号~KF李~回复lol' , res[res.length-1].id )
+        })
+    },
+
+    sendBlack(){
+          
+          var that = this;
+          // console.log(that.black_list)
+          // console.log(JSON.stringify(that.black_list)  )
+          // that.black_list = {"6833237721":["让喔来教你做人"],"6833376306":["让喔来教你做人"],"6833582864":["让喔来教你做人"],"6833780881":["让喔来教你做人"],"6833837518":["让喔来教你做人"],"6834808720":["让喔来教你做人"],"6834815441":["让喔来教你做人"],"6834924001":["让喔来教你做人"],"6835083241":["让喔来教你做人"],"6835992889":["让喔来教你做人"],"6836182679":["让喔来教你做人"],"6841395690":["让喔来教你做人"],"6841554205":["让喔来教你做人"],"6841684855":["让喔来教你做人"],"6843880942":["让喔来教你做人"],"6844049307":["让喔来教你做人"],"6846090511":["让喔来教你做人"],"6846185062":["让喔来教你做人"],"6846375513":["让喔来教你做人"],"6846476639":["让喔来教你做人","我曾路过你的内心"],"6829788047":["我曾路过你的内心"],"6829826389":["我曾路过你的内心"],"6829989073":["我曾路过你的内心"],"6834005531":["我曾路过你的内心"],"6834132472":["我曾路过你的内心"],"6834141816":["我曾路过你的内心"],"6836338859":["我曾路过你的内心"],"6836447639":["我曾路过你的内心"],"6836701164":["我曾路过你的内心"],"6836856444":["我曾路过你的内心"],"6836942158":["我曾路过你的内心"],"6839490696":["我曾路过你的内心"],"6843279067":["我曾路过你的内心"],"6843344454":["我曾路过你的内心"],"6843480700":["我曾路过你的内心"],"6843572256":["我曾路过你的内心"],"6843655566":["我曾路过你的内心"],"6846206185":["我曾路过你的内心"],"6846377800":["我曾路过你的内心"],"6837000069":["BankerAlgorithm"],"6837068771":["BankerAlgorithm"],"6837044194":["BankerAlgorithm"],"6837528248":["BankerAlgorithm"],"6837594193":["BankerAlgorithm"],"6837661973":["BankerAlgorithm"],"6838015393":["BankerAlgorithm"],"6838199137":["BankerAlgorithm"],"6838330677":["BankerAlgorithm"],"6838446105":["BankerAlgorithm"],"6839196679":["BankerAlgorithm"],"6839311154":["BankerAlgorithm"],"6839535451":["BankerAlgorithm"],"6840800983":["BankerAlgorithm"],"6840901935":["BankerAlgorithm"],"6841008466":["BankerAlgorithm"],"6841563709":["BankerAlgorithm"],"6841732626":["BankerAlgorithm"],"6845292574":["BankerAlgorithm"],"6845320946":["BankerAlgorithm"],"6836273133":["翁翁翁z"],"6836368928":["翁翁翁z"],"6836493758":["翁翁翁z"],"6837577070":["翁翁翁z"],"6837665812":["翁翁翁z"],"6837687670":["翁翁翁z"],"6837823026":["翁翁翁z"],"6844313326":["翁翁翁z"],"6844386178":["翁翁翁z","不苦不苦"],"6844494605":["翁翁翁z","不苦不苦"],"6844555994":["翁翁翁z","不苦不苦"],"6844663002":["翁翁翁z","不苦不苦"],"6844742693":["翁翁翁z","不苦不苦"],"6844821992":["翁翁翁z","不苦不苦"],"6844899915":["翁翁翁z","不苦不苦"],"6845000805":["翁翁翁z","不苦不苦"],"6846191203":["翁翁翁z","不苦不苦"],"6846267567":["翁翁翁z","不苦不苦"],"6846397466":["翁翁翁z","不苦不苦"],"6846506931":["翁翁翁z","不苦不苦"],"6832574028":["不苦不苦"],"6832723204":["不苦不苦"],"6833250150":["不苦不苦"],"6833331231":["不苦不苦"],"6833366765":["不苦不苦"],"6833618080":["不苦不苦"],"6843388765":["不苦不苦"],"6843510422":["不苦不苦"]}; 
+          // 开黑列表
+              // var black_list = that.black(that.black_list);
+              // console.log(black_list)
+              // that.form.black_list = black_list
+              // for(var i in black_list){
+              //   var len = black_list[i].length;
+              //   // var tag = len+"黑";
+              //   for(var x in black_list[i]){
+              //     for(var y in that.form.tableData){
+              //       if( black_list[i][x]== that.form.tableData[y]['summoner']){
+              //         that.form.tableData[y]['black'] = len; 
+              //         // break;
+              //       }
+
+              //     }
+              //   }
+              // }
+
+
+        var that = this; 
+        var list = that.form.black_list
+        console.log(list)
+        this.lcu.getCurrConversationID().then((res)=>{
+          for(var i in list){
+            var str =  list[i].join("~和~")+'在开黑'
+            that.lcu.sendConversationMsg(str, res[res.length-1].id )
+          }
+          that.lcu.sendConversationMsg('------来自英雄秒选器~公众号~KF李~回复lol' , res[res.length-1].id )
         })
     },
 
 
     //开黑
     black(list){
-
       // var list = [
       //   "1":['a','b'],
       //   "2":['a','b'],
       //   "3":['a','b'],
       //   "4":['a'],
       //   "5":['v'],
-      // ]
-        
-      // for(var i in list){
-      //   if(list[i].length>1){
-      //     //开黑
-      //   }
-      // }
+      // ];
+      var black = [] ;
+      for(var i in list){
+        if(list[i].length>1){
+          //开黑
+          black.push(list[i].join('#'));
+        }
+      }
+      black = Array.from(new Set(black));
+      if(black.length>1){
+         for(var i in black){
+           black[i] =  black[i].split('#')
+         }
+      }
+      return black;
     },
 
     //计算胜率
@@ -538,8 +750,23 @@ export default {
         kda += (kills+assists)/deaths*3;
         // console.log((kills+assists)/deaths*3)
       }
-      return  (kda/len).toFixed(2); 
+      // return  (kda/len).toFixed(2); 
+
+      return Math.floor(kda/len * 100) / 100;
     },
+    //评估
+    evaluate(kda){
+      var str ='';
+      if(kda >=10 ){
+        str ='上等马';
+      }else if(  6<=kda && kda<10 ){
+        str ='中等马';
+      }else if(kda<6 ){
+        str ='下等马';
+      }
+      return str;
+    },
+    
 
     //计算常用英雄
     commonChampions(games){
@@ -562,7 +789,7 @@ export default {
      
 
     doRequest(){
-          this.lcu.do(this.form.url).then((res) =>{
+          this.lcu.do(this.form.url, this.form.methods).then((res) =>{
            console.log(res)
           })
     },
@@ -580,11 +807,10 @@ export default {
       sendMsg(){
         var that = this; 
         this.lcu.getCurrConversationID().then((res)=>{
-          
-          console.log(res) 
-          console.log(res.length) 
+          // console.log(res) 
+          // console.log(res.length) 
           // var str = '我想玩'+that.form.position+that.findTitle(that.form.champion_id)+",谢谢各位大哥！！！！！"
-          that.lcu.sendConversationMsg(that.form.msg+'------来自英雄秒选器~dou~音KF李~干啥程序员' , res[res.length-1].id )
+          that.lcu.sendConversationMsg(that.form.msg+'------来自英雄秒选器~公众号~KF李~回复lol' , res[res.length-1].id )
         })
       },
 
@@ -607,8 +833,15 @@ export default {
         this.ext_say = this.form.ext.indexOf('say') >-1?true:false;
          // 秒选
         this.ext_pick = this.form.ext.indexOf('pick') >-1?true:false;
+          // 自动设置召唤师技能
+        this.ext_spell = this.form.ext.indexOf('spell') >-1?true:false;
          //  自动发送队友战绩
         this.ext_send = this.form.ext.indexOf('send') >-1?true:false;
+         //  自动发送开黑队友
+        this.ext_black = this.form.ext.indexOf('black') >-1?true:false;
+
+
+        
 
         if (this.job==0) {
           this.job = setInterval(async function (that) {
@@ -617,9 +850,6 @@ export default {
               //打印游戏状态变化
               console.log(that.game_flow)
             }
-
-
-
             if (that.ext_accept&&that.last_game_flow != 'ReadyCheck' && that.game_flow == 'ReadyCheck' ) {
               // 找到对局时自动接受对局
               await that.lcu.accept()
@@ -629,6 +859,7 @@ export default {
 
               if(that.ext_pick){
                 const id = await that.lcu.getActionId()
+                
                 if (id > -1) {
                   // console.log(ext)
                   if(that.ext_say){
@@ -639,6 +870,10 @@ export default {
                   await that.lcu.selectChampion(that.form.champion_id, id)
                 }
               }
+               //召唤师技能设置
+              if(that.ext_spell&&that.form.spell1Id!=0&&that.form.spell2Id!=0&&that.form.spell1Id!=that.form.spell1Id){
+                  that.lcu.selectSummonerSkill(that.form.spell1Id,that.form.spell2Id)
+               }
               
               //查询队友战绩
                setTimeout(function(){
@@ -647,6 +882,12 @@ export default {
                        setTimeout(function(){
                          that.sendInfo();
                       },1500) 
+                    }
+
+                    if(that.ext_black){
+                       setTimeout(function(){
+                         that.sendBlack();
+                      },4000) 
                     }
                 },3000) 
              
