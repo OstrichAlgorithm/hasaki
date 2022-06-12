@@ -63,16 +63,17 @@ export default [
   // },
   // {
   //   path: '/table',
-  //   component: Layout,
-  //   hidden: true ,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: '表格',
-  //       component: () => import('@/views/table/index'),
-  //       meta: { title: '表格', icon: 'table' }
-  //     }
-  //   ]
+  //   // component: Layout,
+  //   component: () => import('@/views/table/index'),
+  //   // hidden: true ,
+  //   // children: [
+  //   //   {
+  //   //     path: 'index',
+  //   //     name: '表格',
+  //   //     component: () => import('@/views/table/index'),
+  //   //     meta: { title: '表格', icon: 'table' }
+  //   //   }
+  //   // ]
   // },
   {
     path: '/',

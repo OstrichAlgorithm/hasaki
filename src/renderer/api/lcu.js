@@ -1,6 +1,8 @@
 import axios from 'axios'
+import $ from 'jquery'
 // import { list } from 'postcss';
 import nickname from "../utils/nickname"
+import heroes from "../utils/heroes"
 import list from "../utils/list"
 import summoner_skill_list from "../utils/summoner_skill_list"
 
@@ -10,11 +12,11 @@ export class Lcu {
   last_game_flow = '';
   champion_id = 0;
   job = 0;
-  ext_accept= false;
+  ext_accept = false;
   // list = {};
-  constructor(token,port) {
+  constructor(token, port) {
     this.token = token;
-    this.port  = port;
+    this.port = port;
     this.url_with_auth = `https://riot:${token}@127.0.0.1:${port}`;
     return this;
   }
@@ -32,12 +34,12 @@ export class Lcu {
       url: url,
       baseURL: this.url_with_auth,
       method: type,
-      data: data?JSON.stringify(data):'',
-      headers:{'Content-Type':'application/json'},
+      data: data ? JSON.stringify(data) : '',
+      headers: { 'Content-Type': 'application/json' },
       responseType: 'json',
-    }).then(function(response) {
+    }).then(function (response) {
       // console.log(response.data);
-      res= response.data
+      res = response.data
     });
     return res;
   }
@@ -54,22 +56,75 @@ export class Lcu {
   }
 
 
-  getChampionName(championIds){
-    championIds = championIds+'';
-    // console.log(list[championIds],championIds) 
-    return  typeof(list[championIds]) == "undefined"?'未知':list[championIds];
+  getChampionName(championIds) {
+    championIds = championIds + '';
+    console.log(list[championIds],championIds) 
+    return typeof (list[championIds]) == "undefined" ? '未知' : list[championIds];
     // return list[championIds]
   }
 
+  getChampionInfo(championIds) {
+    for(var hero of heroes){
+      if(hero.id == championIds){
+        // console.log(heroes[i])
+        // hero.banVoPath = this.url_with_auth+  hero.banVoPath
+        // hero.baseLoadScreenPath = this.url_with_auth+  hero.baseLoadScreenPath
+        // hero.baseSplashPath = this.url_with_auth+  hero.baseSplashPath
+        // hero.chooseVoPath = this.url_with_auth+  hero.chooseVoPath
+        // console.log(hero)
 
-  // //拥有英雄列表
-  async ownedChampions() {
-    var res =  await this.request('/lol-champions/v1/owned-champions-minimal', 'get')
+        return hero;
+      }
+    }
+    return [];
+  }
+
+  async getChampionDetail(championIds) {
+     var  data = ''; 
+     await axios.request({
+      url:   `https://lol.qq.com/act/lbp/common/guides/champDetail/champDetail_${championIds}.js`,
+      // method: type,
+      // data: data ? JSON.stringify(data) : '',
+      // headers: { 'Content-Type': 'application/json' },
+      // responseType: 'json',
+    }).then(function (response) {
+      // console.log(response.data);
+      var str  = response.data
+      const result = str.match(/{"(.*)"}/);
+      data = JSON.parse(result[0]);
+    });
+    return data 
+  }
+  
+  getChampionDetail1(championIds) {
+
+    if (championIds == 0 ) return [];
+    var  data = ''; 
+    $.ajax({
+      url: `https://lol.qq.com/act/lbp/common/guides/champDetail/champDetail_${championIds}.js`,
+      type: "get",
+      cache: true,
+      async:false,  //同步方式发起请求
+      success: function (res) {
+        const result = res.match(/{"(.*)"}/);
+        data = JSON.parse(result[0]);
+      }
+    })
+   return data 
+ }
+
+  
+  
+
+   // 所有英雄列表
+  allChampions() {
+    // var res = await this.request('/lol-champ-select/v1/all-grid-champions', 'get')
     //  console.log(res)
     //整理数据
     var data = [];
     // var list = {};
-    for (var a of res) {
+    for (var a of heroes) {
+      var  nickname_str =  nickname[a.alias]?nickname[a.alias].join('-'):'';
       data.push({
         "alias": a.alias,
         "baseSplashPath": a.baseSplashPath,
@@ -77,7 +132,33 @@ export class Lcu {
         "id": a.id,
         "name": a.name,
         "title": a.title,
-        "label": a.name + '-' + a.title + '-' + a.alias+ '-'+nickname[a.alias].join('-'),
+        "label": a.name + '-' + a.title + '-' + a.alias + '-' +nickname_str,
+      });
+    }
+    return data;
+  }
+  // //拥有英雄列表
+  async ownedChampions() {
+    var res = await this.request('/lol-champions/v1/owned-champions-minimal', 'get')
+    //  console.log(res)
+    //整理数据
+    var data = [];
+    // var list = {};
+    for (var a of res) {
+
+
+
+      var nickname_str  =  nickname[a.alias]?nickname[a.alias].join('-'):'';
+
+
+      data.push({
+        "alias": a.alias,
+        "baseSplashPath": a.baseSplashPath,
+        // "baseLoadScreenPath": a.baseLoadScreenPath,
+        "id": a.id,
+        "name": a.name,
+        "title": a.title,
+        "label": a.name + '-' + a.title + '-' + a.alias + '-' + nickname_str,
       });
       // list[a.id] =  a.title;
     }
@@ -100,17 +181,28 @@ export class Lcu {
   }
 
   // //选择英雄 
-  async selectChampion(champion_id, action_id) {
+  async selectChampion(champion_id, action_id ,completed = true) {
+    var data = {
+      "championId": champion_id,
+      "completed": completed,
+      "type":"pick" 
+    }
+    return await this.request('/lol-champ-select/v1/session/actions/' + action_id, 'patch', data)
+  }
+
+  // 禁用英雄 
+  async banChampion(champion_id, action_id) {
     var data = {
       "championId": champion_id,
       "completed": true,
+      "type":"ban" 
     }
     return await this.request('/lol-champ-select/v1/session/actions/' + action_id, 'patch', data)
   }
 
 
   //选择召唤师 技能  --皮肤 
-  async selectSummonerSkill(spell1Id,spell2Id) {
+  async selectSummonerSkill(spell1Id, spell2Id) {
     var data = {
       // "selectedSkinId": 0,
       "spell1Id": spell1Id,
@@ -131,13 +223,13 @@ export class Lcu {
 
   // 得到位置id 
   async getActionId() {
-    var  res=  await this.session();
+    var res = await this.session();
     return res.localPlayerCellId
   }
   // 得到组队情况
   async session() {
-    var  res=  await this.request('/lol-champ-select/v1/session');
-  return res ;
+    var res = await this.request('/lol-champ-select/v1/session');
+    return res;
   }
 
   //选英雄
@@ -153,30 +245,30 @@ export class Lcu {
   // 获取会话组消息记录
   async listConversationMsg(conversationID) {
     var list = await this.request(`/lol-chat/v1/conversations/${conversationID}/messages`)
-      // console.log(list)
-    	return list
-   }
+    // console.log(list)
+    return list
+  }
 
   // 获取当前对局聊天组
   async getCurrConversationID() {
-	  var res =  await this.request("/lol-chat/v1/conversations")
+    var res = await this.request("/lol-chat/v1/conversations")
     // console.log(res) 
-    return res 
+    return res
   }
 
 
   // 发送消息到聊天组
-  async sendConversationMsg(msg,conversationID ) {
+  async sendConversationMsg(msg, conversationID) {
     var data = {
       "body": msg,
       "type": "chat",
     }
-    await this.request(`/lol-chat/v1/conversations/${conversationID}/messages`,"POST",data)
+    await this.request(`/lol-chat/v1/conversations/${conversationID}/messages`, "POST", data)
   }
 
 
-   // 游戏对局列表
-   async matchlist(summonerID,begIndex,endIndex) {
+  // 游戏对局列表
+  async matchlist(summonerID, begIndex, endIndex) {
 
     return await this.request(`/lol-match-history/v3/matchlist/account/${summonerID}?begIndex=${begIndex}&endIndex=${endIndex}`)
   }
@@ -184,21 +276,21 @@ export class Lcu {
 
 
   // 召唤师技能列表 
-  getSummonerSkillList(){
+  getSummonerSkillList() {
     return summoner_skill_list;
   }
 
-  
 
 
-  async do(url, type="GET",data={}) {
-    return await this.request(url,type,data)
+
+  async do(url, type = "GET", data = {}) {
+    return await this.request(url, type, data)
   }
 
 
 
 
-  
+
 
 
   // //秒选任务
@@ -220,15 +312,15 @@ export class Lcu {
   //       }
   //       that.last_game_flow = that.game_flow
   //     }, 1500, that);
-      
+
   //   } else {
   //     clearInterval(this.job);
   //     this.job = 0;
   //   }
   // }
- 
 
-  
+
+
 
 }
 

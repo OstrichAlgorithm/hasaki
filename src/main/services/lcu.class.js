@@ -24,8 +24,8 @@ class Lcu {
 
   req(url, type = "get", data = '') {
     url = this.url_with_auth + url;
-    var authority = "127.0.0.1:"+this.port;
-    console.log(url) 
+    var authority = "127.0.0.1:" + this.port;
+    console.log(url)
     return new Promise(function (resolve, reject) {
       request({
         url: url,
@@ -43,9 +43,42 @@ class Lcu {
     })
   }
 
+
+  get(url, type = "get", data = '') {
+    console.log(url)
+    return new Promise(function (resolve, reject) {
+      request({
+        url: url,
+        method: type,
+        json: true,
+        body: data ? JSON.stringify(data) : '',
+      }, function (error, response, body) {
+        if (error) {
+          reject(error)
+        } else {
+          // console.log(body)
+          resolve(body)
+        }
+      })
+    })
+  }
+
   //当前角色 
   async summoner() {
     return await this.req('/lol-summoner/v1/current-summoner', 'get')
+  }
+
+
+  // 通过名字查信息id 
+  async querySummonersByName(name) {
+    return await this.req(`/lol-summoner/v1/summoners?name=${name}`);
+
+  }
+
+  // 游戏对局列表
+  async matchlist(summonerID, begIndex, endIndex) {
+
+    return await this.req(`/lol-match-history/v3/matchlist/account/${summonerID}?begIndex=${begIndex}&endIndex=${endIndex}`)
   }
 
 
@@ -98,7 +131,7 @@ class Lcu {
     console.log('accept')
     await this.req('/lol-matchmaking/v1/ready-check/accept', 'post');
     // console.log(res)
-    
+
   }
 
   // 得到位置id 
@@ -123,9 +156,9 @@ class Lcu {
     //每分钟的1秒定时执行一次:
 
     var that = this;
-    this.champion_id  = champion_id;
-    console.log("champion_id",champion_id)
-    if (!this.job){
+    this.champion_id = champion_id;
+    console.log("champion_id", champion_id)
+    if (!this.job) {
       this.job = setInterval(async function (that) {
         that.game_flow = await that.gameFlow()
         // console.log(that.game_flow)
@@ -143,7 +176,7 @@ class Lcu {
         that.last_game_flow = that.game_flow
 
       }, 1000, that);
-    }else{
+    } else {
       clearInterval(this.job);
       this.job = '';
     }
@@ -153,6 +186,78 @@ class Lcu {
 
 
 
+
+
+  //局内游戏
+  // 
+  async getPlayerList() {
+    return await this.get('https://127.0.0.1:2999/liveclientdata/playerlist')
+  }
+
+
+
+  //计算胜率
+  win(games) {
+    var win = 0;
+    var len = games.length;
+    for (var i in games) {
+      if (games[i].participants[0].stats.win) {
+        win += 1;
+      }
+      // console.log((kills+assists)/deaths*3)
+    }
+    return (win / len * 100.00).toFixed(2) + "%";
+  }
+
+
+  //计算场均kda
+  kda(games) {
+    var kda = 0.00;
+    var len = games.length;
+    for (var i in games) {
+      var kills = games[i].participants[0].stats.kills;
+      var deaths = games[i].participants[0].stats.deaths;
+      var assists = games[i].participants[0].stats.assists;
+      deaths = deaths == 0 ? 1 : deaths;
+      kda += (kills + assists) / deaths * 3;
+      // console.log((kills+assists)/deaths*3)
+    }
+    // return  (kda/len).toFixed(2); 
+    return Math.floor(kda / len * 100) / 100;
+  }
+
+  //评估
+  evaluate(kda) {
+    var str = '';
+    if (kda >= 10) {
+      str = '上等马';
+    } else if (6 <= kda && kda < 10) {
+      str = '中等马';
+    } else if (kda < 6) {
+      str = '下等马';
+    }
+    return str;
+  }
+
+
+  //计算常用英雄
+  commonChampions(games) {
+    var championIds = [];
+    for (var i in games) {
+      championIds.push(games[i].participants[0].championId)
+    }
+    var map = championIds.reduce((m, x) => m.set(x, (m.get(x) || 0) + 1), new Map());
+    var arr_obj = Array.from(map);
+    arr_obj.sort((x, y) => { return y[1] - x[1]; })
+    // map = new Map(arr_obj.map(i=>[i[0],i[1]]) )
+    // console.log(map)
+    var champions = [];
+    for (var i in arr_obj) {
+      // champions.push(this.getChampionName(arr_obj[i][0] + ''));
+      champions.push(arr_obj[i][0] + '');
+    }
+    return champions;
+  }
 
 
 }

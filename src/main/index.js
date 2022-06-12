@@ -1,23 +1,30 @@
 'use strict'
 
-import { app } from 'electron'
+import { app ,globalShortcut} from 'electron'
+
 import initWindow from './services/windowManager'
+import initShortcut from './services/shortcut'
 import DisableButton from './config/DisableButton'
 import electronDevtoolsInstaller, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-
-
-
-
 
 // main/index.js
 import { ipcMain } from 'electron'
 import { ebtMain } from 'electron-baidu-tongji'
 
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 ebtMain(ipcMain, isDevelopment)
 
+
+//sentry
+import * as Sentry from "@sentry/electron";
+Sentry.init({ dsn: "https://d86b80bd197444bca37b0351a77d94e3@o376260.ingest.sentry.io/6395566" });
+
+
+
 function onAppReady () {
   initWindow()
+  initShortcut()
   DisableButton.Disablef12()
   if (process.env.NODE_ENV === 'development') {
     electronDevtoolsInstaller(VUEJS_DEVTOOLS)
@@ -52,3 +59,9 @@ if (process.defaultApp) {
 } else {
   app.setAsDefaultProtocolClient('electron-vue-template')
 }
+
+
+app.on('will-quit', () => {
+  // 注销所有快捷键
+  globalShortcut.unregisterAll()
+})

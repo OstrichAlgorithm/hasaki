@@ -17,6 +17,34 @@
                 style="width: 128px; height: 72px"
                 :src="'https://127.0.0.1:'+auth.port+item.baseSplashPath"
                 :fit="contain"
+                
+              ></el-image>
+              </span>
+              <span
+                style="
+                  float: right;
+                  color: var(--el-text-color-secondary);
+                  font-size: 13px;
+                "
+                >{{ item.name+'-'+ item.title+'-'+item.alias }}</span
+              >
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="10">
+          <el-select v-model="form.ban_champion_id"  placeholder="禁用英雄" filterable  :disabled="form.ban_champion_id_disabled">
+            <el-option
+              v-for="item in ban_options"
+              :key="item.id"
+              :value="item.id"
+              :label="item.label"
+              style="height:72px"
+            >
+              <span style="float: left">
+              <el-image
+                style="width: 128px; height: 72px"
+                :src="'https://127.0.0.1:'+auth.port+item.baseSplashPath"
+                :fit="contain"
               ></el-image>
               </span>
               <span
@@ -84,6 +112,7 @@
         </el-col>
          
       </el-form-item>
+      
 
       <el-form-item label="秒选喊话" label-width="120px">
         <el-col :span="18">
@@ -172,6 +201,107 @@
         </el-col>
       </el-form-item>
 
+
+
+      <el-form-item label="阵容分析" label-width="">
+      <el-col :span="10">
+        <div class="block">
+         <el-table
+            :data="my_team"
+            stripe
+            style="width: 100%;">
+             <el-table-column
+              prop="champion"
+              width="90%"
+              label="我方英雄">
+              <template slot-scope="scope">
+                <span>
+                  {{scope.row.position}}-
+                  {{scope.row.champion}}<br>
+                  <el-image
+                style="width: 28px; height: 28px"
+                :src="'https://127.0.0.1:'+auth.port+scope.row.champion_avatar"
+                :fit="contain" lazy
+              ></el-image>
+                </span>
+                 
+              </template>
+            </el-table-column>
+
+             <el-table-column>
+              <template slot-scope="props">
+                <el-form label-position="left" inline class="demo-table-expand" style="height:200px">
+                   <el-form-item label="" v-for="item in  props.row.ext "  :key="item.championid2">
+                    <span>
+                    对位
+                     <el-button type="primary" size="medium"  circle   style="background-size: contain;width:28px;height:28px;" :style="'background-image: url('+'https://127.0.0.1:'+auth.port+item.champion2_avatar+');'">
+                               </el-button>
+                    胜率<el-tag :type='item.winrate>5000?"danger":"success"'>{{ item.winrate/100.00 }}% </el-tag>
+                    单杀率<el-tag :type='item.ikillrate>5000?"danger":"success"'>{{ item.ikillrate/100.00 }}% </el-tag>
+                    </span>
+                  </el-form-item>
+                </el-form>
+              </template>
+            </el-table-column>
+            
+            
+          </el-table>
+      </div>
+      </el-col>
+      <el-col :span="12">
+      
+        <div class="block">
+        <span class="demonstration"></span>
+         <el-table
+            :data="their_team"
+            stripe
+            style="width: 100%;">
+           
+             <el-table-column
+              prop="champion"
+              width="90%"
+              label="敌方英雄">
+               <template slot-scope="scope">
+                <span>{{scope.row.champion}}</span><br>
+                 <el-image
+                style="width: 28px; height: 28px"
+                :src="'https://127.0.0.1:'+auth.port+scope.row.champion_avatar"
+                :fit="contain"
+              ></el-image>
+              </template>
+              
+            </el-table-column>
+
+            <el-table-column >
+              <template slot-scope="props">
+                <el-form label-position="left" inline class="demo-table-expand">
+                      <el-tabs tab-position="left" style="height: 200px;">
+                        <el-tab-pane :label="value.position" v-for="(value ,key) in  props.row.ext"   :key="key" >
+                          <div style="height:200px;overflow:auto;">
+                            <el-form-item label="" v-for="item in value.list "  :key="item.champion2_avatar">
+                              <span>对线
+                               <el-button type="primary" size="medium"  circle @click="chooseChampion(item.championid2)"    style="background-size: contain;width:28px;height:28px;" :style="'background-image: url('+'https://127.0.0.1:'+auth.port+item.champion2_avatar+');'">
+                               </el-button>
+                             
+                                胜率<el-tag :type='item.winrate>5000?"danger":"success"'>{{ item.winrate/100.00 }}% </el-tag>
+                                单杀率<el-tag :type='item.ikillrate>5000?"danger":"success"'>{{ item.ikillrate/100.00 }}% </el-tag>
+                              </span>
+                            </el-form-item>
+                          </div>
+                        </el-tab-pane>
+                      </el-tabs>
+                </el-form>
+              </template>
+            </el-table-column>
+            
+          </el-table>
+      </div>
+      </el-col>
+
+
+      
+      </el-form-item>
+
        <el-form-item label="url" label-width="120px"  style="display:none;">
         <el-col :span="18">
           <el-input
@@ -216,6 +346,7 @@
         <el-button   @click="sendBlack" > 开黑发送</el-button>
 
         <el-button   @click="onTest"   style="display:none;"> onTest</el-button>
+        <el-button   @click="openWin"   style="display:none;"> 窗口</el-button>
       </el-form-item>
 
 
@@ -249,6 +380,9 @@
 import { ipcRenderer , shell } from "electron";
 import { Lcu } from "@/api/lcu"
 
+// import { init } from '@sentry/electron';
+import * as Sentry from "@sentry/electron/renderer";
+
 
 
 
@@ -259,6 +393,9 @@ export default {
     this.init()
   },
   created() {
+    // Sentry.init({});
+    Sentry.init({ dsn: "https://d86b80bd197444bca37b0351a77d94e3@o376260.ingest.sentry.io/6395566" });
+
     ipcRenderer.on("download-progress", (event, arg) => {
       this.percentage = Number(arg);
     });
@@ -369,9 +506,11 @@ export default {
       form: {
         champion_title:'',
         champion_id: "",
+        ban_champion_id: "",
         spell1Id:0,
         spell2Id:0,
         champion_id_disabled:false,
+        ban_champion_id_disabled:false,
         ext: [],
         ext_disabled:false,
         submit_running: false,
@@ -392,15 +531,29 @@ export default {
       },
       black_list:{},
       options :  [],
+      ban_options :  [],
       job:0,
       game_flow:'',
       last_game_flow:'',
       ext_accept:false,
       ext_say:false,
-    
-    }
 
-  },
+      their_team:[
+        // {
+        //   win: "80%", 
+        //   champion:"加里奥"
+        // } 
+      ],
+      my_team :[
+        // {
+        //   position: '1L辅助',
+        //   win: "80%", 
+        //   kda:'11.0', 
+        //   champion:"加里奥"
+        // } 
+      ],
+    }
+   },
   methods: {
     onSubmit() {
       // if( this.form.champion_id=="") {
@@ -414,6 +567,7 @@ export default {
 
       this.form.submit_running = !this.form.submit_running
       this.form.champion_id_disabled = this.form.submit_running
+      this.form.ban_champion_id_disabled = this.form.submit_running
       this.form.ext_disabled = this.form.submit_running
       this.$message({
            message: this.form.submit_running?'运行中':'已停止',
@@ -454,21 +608,15 @@ export default {
      handleClose() {
       this.dialogVisible = false;
     },
-     
-
 
     init(){
       var that =this;
       that.getAuth()
       that.CheckUpdate('one')
-      setInterval(function(){
-        return  that.updateAuth()
-      },20000)
-
-      
-
+      // setInterval(function(){
+      //   return  that.updateAuth()
+      // },20000)
     },
-   
       getAuth(){
         var  that  =  this; 
        ipcRenderer.invoke("lcu-auth").then((res) => {
@@ -477,19 +625,14 @@ export default {
           that.lcu.url_with_auth = res.url_with_auth;
             that.lcu.ownedChampions().then((res)=>{
               that.options =  res
-
             })
-
+            that.ban_options = that.lcu.allChampions();
             that.summoner_skill_list =  that.lcu.getSummonerSkillList();
-
-          //  that.options = that.lcu.ownedChampions()
-        });       
-        
+          });       
       },
-
        updateAuth(){
         var  that  =  this; 
-       ipcRenderer.invoke("lcu-auth").then((res) => {
+        ipcRenderer.invoke("lcu-auth").then((res) => {
             that.auth = res
             that.lcu.token = res.token;
             that.lcu.port  = res.port;
@@ -500,11 +643,321 @@ export default {
           //  that.options = that.lcu.ownedChampions()
         });
       },
+    //对局页面
+    updateGame(data){
+      var that = this;
+      var position_map ={
+        "middle":"中单",
+        "top":"上单",
+        "jungle":"打野",
+        "bottom":"下路",
+        "utility":"辅助",
+      };
 
-       onTest(){
+      // var position_map_1 ={
+      //   "middle":"mid",
+      //   "top":"top",
+      //   "jungle":"jungle",
+      //   "bottom":"bottom",
+      //   "utility":"support",
+      // };
+      var position_map_1 ={
+        "中单":"mid",
+        "上单":"top",
+        "打野":"jungle",
+        "下路":"bottom",
+        "辅助":"support",
+      };
+       var position_map_2 ={
+        "mid":"中单",
+        "top":"上单",
+        "jungle":"打野",
+        "bottom":"下路",
+        "support":"辅助",
+      };
+
+      // var data ={"actions":[[{"actorCellId":0,"championId":60,"completed":true,"id":0,"isAllyAction":false,"isInProgress":false,"type":"ban"},{"actorCellId":1,"championId":875,"completed":true,"id":1,"isAllyAction":false,"isInProgress":false,"type":"ban"},{"actorCellId":2,"championId":29,"completed":true,"id":2,"isAllyAction":false,"isInProgress":false,"type":"ban"},{"actorCellId":3,"championId":517,"completed":true,"id":3,"isAllyAction":false,"isInProgress":false,"type":"ban"},{"actorCellId":4,"championId":101,"completed":true,"id":4,"isAllyAction":false,"isInProgress":false,"type":"ban"},{"actorCellId":5,"championId":81,"completed":true,"id":5,"isAllyAction":true,"isInProgress":false,"type":"ban"},{"actorCellId":6,"championId":101,"completed":true,"id":6,"isAllyAction":true,"isInProgress":false,"type":"ban"},{"actorCellId":7,"championId":104,"completed":true,"id":7,"isAllyAction":true,"isInProgress":false,"type":"ban"},{"actorCellId":8,"championId":62,"completed":true,"id":8,"isAllyAction":true,"isInProgress":false,"type":"ban"},{"actorCellId":9,"championId":234,"completed":true,"id":9,"isAllyAction":true,"isInProgress":false,"type":"ban"}],[{"actorCellId":-1,"championId":0,"completed":true,"id":100,"isAllyAction":false,"isInProgress":false,"type":"ten_bans_reveal"}],[{"actorCellId":0,"championId":121,"completed":true,"id":10,"isAllyAction":false,"isInProgress":false,"type":"pick"}],[{"actorCellId":5,"championId":50,"completed":true,"id":11,"isAllyAction":true,"isInProgress":false,"type":"pick"},{"actorCellId":6,"championId":236,"completed":true,"id":12,"isAllyAction":true,"isInProgress":false,"type":"pick"}],[{"actorCellId":1,"championId":266,"completed":true,"id":13,"isAllyAction":false,"isInProgress":false,"type":"pick"},{"actorCellId":2,"championId":145,"completed":true,"id":14,"isAllyAction":false,"isInProgress":false,"type":"pick"}],[{"actorCellId":7,"championId":3,"completed":true,"id":15,"isAllyAction":true,"isInProgress":false,"type":"pick"},{"actorCellId":8,"championId":79,"completed":true,"id":16,"isAllyAction":true,"isInProgress":false,"type":"pick"}],[{"actorCellId":3,"championId":115,"completed":false,"id":17,"isAllyAction":false,"isInProgress":true,"type":"pick"},{"actorCellId":4,"championId":0,"completed":false,"id":18,"isAllyAction":false,"isInProgress":true,"type":"pick"}],[{"actorCellId":9,"championId":0,"completed":false,"id":19,"isAllyAction":true,"isInProgress":false,"type":"pick"}]],"allowBattleBoost":false,"allowDuplicatePicks":false,"allowLockedEvents":false,"allowRerolling":false,"allowSkinSelection":true,"bans":{"myTeamBans":[],"numBans":0,"theirTeamBans":[]},"benchChampionIds":[],"benchEnabled":false,"boostableSkinCount":0,"chatDetails":{"chatRoomName":"503a2dbe-038f-4628-87ac-f171d8cc279c@champ-select.pvp.net","chatRoomPassword":null},"counter":42,"entitledFeatureState":{"additionalRerolls":0,"unlockedSkinIds":[]},"gameId":6949162512,"hasSimultaneousBans":true,"hasSimultaneousPicks":false,"isCustomGame":false,"isSpectating":false,"localPlayerCellId":7,"lockedEventIndex":-1,"myTeam":[{"assignedPosition":"utility","cellId":5,"championId":50,"championPickIntent":0,"entitledFeatureType":"NONE","selectedSkinId":50001,"spell1Id":4,"spell2Id":3,"summonerId":0,"team":2,"wardSkinId":-1},{"assignedPosition":"bottom","cellId":6,"championId":236,"championPickIntent":0,"entitledFeatureType":"NONE","selectedSkinId":236008,"spell1Id":7,"spell2Id":4,"summonerId":0,"team":2,"wardSkinId":-1},{"assignedPosition":"middle","cellId":7,"championId":3,"championPickIntent":0,"entitledFeatureType":"NONE","selectedSkinId":3001,"spell1Id":14,"spell2Id":4,"summonerId":2937231739,"team":2,"wardSkinId":19},{"assignedPosition":"top","cellId":8,"championId":79,"championPickIntent":0,"entitledFeatureType":"NONE","selectedSkinId":79007,"spell1Id":4,"spell2Id":12,"summonerId":0,"team":2,"wardSkinId":-1},{"assignedPosition":"jungle","cellId":9,"championId":0,"championPickIntent":0,"entitledFeatureType":"NONE","selectedSkinId":0,"spell1Id":4,"spell2Id":11,"summonerId":0,"team":2,"wardSkinId":-1}],"recoveryCounter":0,"rerollsRemaining":0,"skipChampionSelect":false,"theirTeam":[{"assignedPosition":"","cellId":0,"championId":121,"championPickIntent":0,"entitledFeatureType":"","selectedSkinId":121000,"spell1Id":0,"spell2Id":0,"summonerId":0,"team":1,"wardSkinId":-1},{"assignedPosition":"","cellId":1,"championId":266,"championPickIntent":0,"entitledFeatureType":"","selectedSkinId":266000,"spell1Id":0,"spell2Id":0,"summonerId":0,"team":1,"wardSkinId":-1},{"assignedPosition":"","cellId":2,"championId":145,"championPickIntent":0,"entitledFeatureType":"","selectedSkinId":145000,"spell1Id":0,"spell2Id":0,"summonerId":0,"team":1,"wardSkinId":-1},{"assignedPosition":"","cellId":3,"championId":0,"championPickIntent":0,"entitledFeatureType":"","selectedSkinId":0,"spell1Id":0,"spell2Id":0,"summonerId":0,"team":1,"wardSkinId":-1},{"assignedPosition":"","cellId":4,"championId":0,"championPickIntent":0,"entitledFeatureType":"","selectedSkinId":0,"spell1Id":0,"spell2Id":0,"summonerId":0,"team":1,"wardSkinId":-1}],"timer":{"adjustedTimeLeftInPhase":27086,"internalNowInEpochMs":1652700481139,"isInfinite":false,"phase":"BAN_PICK","totalTimeInPhase":30000},"trades":[]};
+      var actions  = data.actions;
+      var my_team  = []
+      var their_team  = [] 
+      //由action 得出英雄列表
+      var localPlayerCellId = data.localPlayerCellId;
+      //ban选是否结束
+      if(actions[1][0].completed ==  false)
+        return;
+
+
+      for(var index = 2; index<actions.length ; index++){
+        for(var act of actions[index]){
+          console.log(act)
+          if(act.isAllyAction){
+            //找位置
+            var position ='';
+            for(var t of  data.myTeam){
+               if(t.cellId == act.actorCellId){
+                  position = t.assignedPosition
+              }
+            }
+            //队友
+            my_team[act.actorCellId >4? (act.actorCellId-5):act.actorCellId]= {
+              position:  position,
+              // champion:  ''
+              // champion_avatar: '',
+              champion_id:  act.championId,
+              // ext:[]
+            }
+            // my_team.push( {
+            //   position:  position,
+            //   // champion:  ''
+            //   // champion_avatar: '',
+            //   champion_id:  act.championId,
+            //   // ext:[]
+            // });
+          }else{
+            //敌方
+             their_team[act.actorCellId >4? (act.actorCellId-5):act.actorCellId]= {
+              // champion:  ''
+              // champion_avatar: '',
+              champion_id:  act.championId,
+              // ext:[]
+            }
+            // their_team.push( {
+            //   position:  '',
+            //   // champion:  ''
+            //   // champion_avatar: '',
+            //   champion_id:  act.championId,
+            //   // ext:[]
+            // });
+          }
+        }
+      }
+
+
+      console.log(my_team)
+      console.log(their_team)
+      // return;
+      
+
+      
+
+
+       // // 敌方英雄ids
+        var  their_champion_ids= []; 
+        their_team.forEach(item => {
+            their_champion_ids.push(
+              item.champion_id+""
+            )
+          })
+          console.log(their_champion_ids)
+      // 我方信息
+      for(var i in  my_team){
+        var championInfo = that.lcu.getChampionInfo(my_team[i].champion_id)
+
+        if(my_team[i].champion_id == 0){
+           my_team[i] = {
+            position:  position_map[my_team[i].position],
+            champion:  '待选择',
+            champion_avatar: '',
+            champion_id:  0,
+            ext:[]
+          }
+          continue;
+        }
+        my_team[i] = {
+          position:  position_map[my_team[i].position],
+          champion:  championInfo['title'],
+          champion_avatar:  championInfo['squarePortraitPath'],
+          champion_id:  my_team[i].champion_id,
+          ext:[]
+        }
+      }
+
+      
+
+
+
+      for(var i in  my_team){
+
+        if(my_team[i].champion_id == 0){
+
+          continue;
+        }
+        var detail = this.lcu.getChampionDetail1(my_team[i].champion_id);
+        console.log(detail)
+        // var fight  = detail.list.championFight[position_map_1[data.myTeam[i].assignedPosition]]
+        var fight  = detail.list.championFight[position_map_1[my_team[i].position]]
+        console.log(fight)
+        // // //对位数据搜寻
+        var  fight_data = [];
+        for(var x  in fight){
+          if(-1!= their_champion_ids.indexOf(fight[x].championid2) ){
+            fight_data.push(fight[x])
+          }
+        }
+        console.log(fight_data)
+        // //可能对位数据 
+        for(var temp  of fight_data){
+          var champion2Info = that.lcu.getChampionInfo(temp.championid2)
+          
+          if( parseInt(temp.championid1)  == my_team[i].champion_id ){
+             my_team[i].ext.push({
+              ikillrate :temp.ikillrate,
+              winrate:temp.winrate,
+              championid2: temp.championid2,
+              champion2_avatar:  champion2Info['squarePortraitPath'],
+              championid2_name: champion2Info['title']
+            } )
+          }
+        }
+    
+      }
+      console.log(my_team)
+      this.my_team  = my_team
+
+      
+      // //敌方信息
+      for(var i in  their_team){
+        var championInfo = that.lcu.getChampionInfo(their_team[i].champion_id)
+        their_team[i] = {
+          champion:  championInfo['title'],
+          champion_avatar:  championInfo['squarePortraitPath'],
+          champion_id:  their_team[i].champion_id,
+          ext:[]
+        }
+      }
+      
+
+
+
+      for(var i in their_team){
+
+          if(their_team[i].champion_id == 0){
+            continue;
+          }
+          // 对位数据
+          var detail = that.lcu.getChampionDetail1(their_team[i].champion_id);
+          console.log(detail)
+          var ext = [] ;
+          if(detail.list.championFight){
+              var  fight= detail.list.championFight
+              for(var key in fight){
+              var a =  fight[key].map(i=>{
+              // ext[position_map_2[key]] = fight[key].map(i=>{
+                 var champion2Info = that.lcu.getChampionInfo(i.championid2)
+                  return { 
+                    ikillrate :i.ikillrate,
+                    winrate:i.winrate,
+                    championid2: i.championid2,
+                    champion2_avatar:  champion2Info['squarePortraitPath'],
+                    championid2_name: champion2Info['title'] 
+                  }
+                }) 
+                ext.push({
+                  "position": position_map_2[key],
+                  "list" : a
+                })
+              }
+          }
+          their_team[i].ext = ext
+      }
+
+      this.their_team  = their_team
+    },
+    
+
+
+      paiwei(){
           var that = this;
+          this.lcu.session().then(res=>{
+             console.log(res)
+             console.log(res.timer.phase)
+            if(res.actions[0][0].type!='ban' )
+              return;
+            //解析页面
+            this.updateGame(res)
+            
+            if(res.timer.phase == 'PLANNING'){ 
+                //  that.lcu.banChampion(104,res.localPlayerCellId ).then(res=>{
+                //    console.log(res)
+                //  })
+                //预选英雄
+             }
+            if(res.timer.phase == 'BAN_PICK'){ 
+              //禁用英雄阶段
+              // if(res.actions[0][res.localPlayerCellId].isInProgress &&!res.actions[0][res.localPlayerCellId].completed){
+              //   that.lcu.banChampion(104,res.localPlayerCellId ).then(res=>{
+              //     console.log(res)
+              //   })
+              // }
+              // //禁用英雄完毕，展示阶段
+              // if(res.actions[1][0].isInProgress &&!res.actions[1][0].completed){
+               
+              // }
+              // 选英雄阶段 
+              for(var i in res.actions ){
+                for(var j in res.actions[i] ){
+                  if(that.ext_pick && res.actions[i][j].isInProgress && res.actions[i][j].actorCellId==res.localPlayerCellId  && !res.actions[i][j].completed ){
+                    //禁用英雄阶段
+                    if(res.actions[i][j].type == 'ban' ){
+                       console.log("banban")
+                       if(that.form.ban_champion_id!=0){
+                          that.lcu.banChampion(that.form.ban_champion_id,res.localPlayerCellId ).then(res=>{
+                            console.log(res)
+                          })
+                       }
+                        
+                        
+                     
+                    }else if(res.actions[i][j].type == 'pick' && res.actions[i][j].actorCellId==res.localPlayerCellId  && !res.actions[i][j].completed){
+                      console.log("pickpick")
+                      // 选择英雄策略
+                       if(that.form.champion_id!=0){
+                          that.lcu.selectChampion(that.form.champion_id,res.localPlayerCellId ).then(res=>{
+                            console.log(res)
+                           })
+                       }
+                      
+                      // that.lcu.selectChampion(that.form.champion_id,res.localPlayerCellId ).then(res=>{
+                      //   console.log(res)
+                      // })
+                    }else if(res.actions[i][j].type == 'ten_bans_reveal' ){
+                       console.log("ten_bans_revealten_bans_reveal")
+                    }
 
-          // console.log(that.lcu.getSummonerSkillList())
+                    return;
+                  }
+                }
+              }
+            }
+           })
+    },
+    openWin(){
+      // this.their_team = this.their_team
+      console.log( this.their_team)
+      
+
+      var detail = this.lcu.getChampionDetail1(1);
+          // var   fight= detail.list.championFight
+          console.log(detail)
+
+
+      //  ipcRenderer.invoke("open-win",{url:"table"}).then((res) => {
+      //       console.log("启动");
+      //     });
+
+    },
+
+    onTest(){
+
+      this.paiwei();
+      
+      // this.updateGame();
+
+// this.lcu.getChampionDetail(1)
+      // var a = setInterval(()=>{
+      //   this.paiwei()
+      // },1000)
+  // console.log(that.lcu.getSummonerSkillList())
           // this.lcu.do("/lol-champ-select/v1/session/my-selection","PATCH",{
           //   "spell1Id": 1,
           //   "spell2Id": 14,
@@ -520,6 +973,7 @@ export default {
 
           // })
     },
+   
 
        onTest1(){
           var that = this;
@@ -662,8 +1116,6 @@ export default {
     },
 
     sendBlack(){
-          
-          var that = this;
           // console.log(that.black_list)
           // console.log(JSON.stringify(that.black_list)  )
           // that.black_list = {"6833237721":["让喔来教你做人"],"6833376306":["让喔来教你做人"],"6833582864":["让喔来教你做人"],"6833780881":["让喔来教你做人"],"6833837518":["让喔来教你做人"],"6834808720":["让喔来教你做人"],"6834815441":["让喔来教你做人"],"6834924001":["让喔来教你做人"],"6835083241":["让喔来教你做人"],"6835992889":["让喔来教你做人"],"6836182679":["让喔来教你做人"],"6841395690":["让喔来教你做人"],"6841554205":["让喔来教你做人"],"6841684855":["让喔来教你做人"],"6843880942":["让喔来教你做人"],"6844049307":["让喔来教你做人"],"6846090511":["让喔来教你做人"],"6846185062":["让喔来教你做人"],"6846375513":["让喔来教你做人"],"6846476639":["让喔来教你做人","我曾路过你的内心"],"6829788047":["我曾路过你的内心"],"6829826389":["我曾路过你的内心"],"6829989073":["我曾路过你的内心"],"6834005531":["我曾路过你的内心"],"6834132472":["我曾路过你的内心"],"6834141816":["我曾路过你的内心"],"6836338859":["我曾路过你的内心"],"6836447639":["我曾路过你的内心"],"6836701164":["我曾路过你的内心"],"6836856444":["我曾路过你的内心"],"6836942158":["我曾路过你的内心"],"6839490696":["我曾路过你的内心"],"6843279067":["我曾路过你的内心"],"6843344454":["我曾路过你的内心"],"6843480700":["我曾路过你的内心"],"6843572256":["我曾路过你的内心"],"6843655566":["我曾路过你的内心"],"6846206185":["我曾路过你的内心"],"6846377800":["我曾路过你的内心"],"6837000069":["BankerAlgorithm"],"6837068771":["BankerAlgorithm"],"6837044194":["BankerAlgorithm"],"6837528248":["BankerAlgorithm"],"6837594193":["BankerAlgorithm"],"6837661973":["BankerAlgorithm"],"6838015393":["BankerAlgorithm"],"6838199137":["BankerAlgorithm"],"6838330677":["BankerAlgorithm"],"6838446105":["BankerAlgorithm"],"6839196679":["BankerAlgorithm"],"6839311154":["BankerAlgorithm"],"6839535451":["BankerAlgorithm"],"6840800983":["BankerAlgorithm"],"6840901935":["BankerAlgorithm"],"6841008466":["BankerAlgorithm"],"6841563709":["BankerAlgorithm"],"6841732626":["BankerAlgorithm"],"6845292574":["BankerAlgorithm"],"6845320946":["BankerAlgorithm"],"6836273133":["翁翁翁z"],"6836368928":["翁翁翁z"],"6836493758":["翁翁翁z"],"6837577070":["翁翁翁z"],"6837665812":["翁翁翁z"],"6837687670":["翁翁翁z"],"6837823026":["翁翁翁z"],"6844313326":["翁翁翁z"],"6844386178":["翁翁翁z","不苦不苦"],"6844494605":["翁翁翁z","不苦不苦"],"6844555994":["翁翁翁z","不苦不苦"],"6844663002":["翁翁翁z","不苦不苦"],"6844742693":["翁翁翁z","不苦不苦"],"6844821992":["翁翁翁z","不苦不苦"],"6844899915":["翁翁翁z","不苦不苦"],"6845000805":["翁翁翁z","不苦不苦"],"6846191203":["翁翁翁z","不苦不苦"],"6846267567":["翁翁翁z","不苦不苦"],"6846397466":["翁翁翁z","不苦不苦"],"6846506931":["翁翁翁z","不苦不苦"],"6832574028":["不苦不苦"],"6832723204":["不苦不苦"],"6833250150":["不苦不苦"],"6833331231":["不苦不苦"],"6833366765":["不苦不苦"],"6833618080":["不苦不苦"],"6843388765":["不苦不苦"],"6843510422":["不苦不苦"]}; 
@@ -823,6 +1275,18 @@ export default {
       },
 
 
+    chooseChampion(id){
+
+      var that = this;
+      console.log(id)
+      that.lcu.getActionId().then(actorCellId=>{
+         if (actorCellId > -1) {
+           that.lcu.selectChampion(id, actorCellId ,  false)
+        }
+      })
+      
+    },
+
       
       //秒选任务
       pickTask() {
@@ -853,9 +1317,11 @@ export default {
             if (that.ext_accept&&that.last_game_flow != 'ReadyCheck' && that.game_flow == 'ReadyCheck' ) {
               // 找到对局时自动接受对局
               await that.lcu.accept()
-            } else if (that.last_game_flow != 'ChampSelect' && that.game_flow == 'ChampSelect') {
+            } else if (that.last_game_flow != 'ChampSelect' && that.game_flow == 'ChampSelect') {   
               //选人阶段 秒选
               // 得到位置号
+
+
 
               if(that.ext_pick){
                 const id = await that.lcu.getActionId()
@@ -891,7 +1357,9 @@ export default {
                     }
                 },3000) 
              
-            }
+            }else if (that.game_flow == 'ChampSelect') { 
+               that.paiwei()
+             }
             that.last_game_flow = that.game_flow
           }, 1500, that);
           
